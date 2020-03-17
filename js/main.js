@@ -205,8 +205,6 @@
 
     const buttonInOut = (element, cb) =>
     {
-        element.addEventListener('click', OnClick, false);
-
         const Update = () => {
             element.innerText = localStorage.isAdmin ? 'Sign Out' : 'Sign In';
         };
@@ -227,6 +225,9 @@
                 $('#loginModal').modal('show');
             }
         }
+
+        element.addEventListener('click', OnClick, false);
+        Update();
 
         return { Update };
     };
