@@ -72,7 +72,7 @@
                 _itemsHolder.parentElement.style.visibility = "hidden";
             },
             getOrder = _ => {
-                return localStorage.sort != null ? 'sort='+localStorage.sort : '';
+                return localStorage.sort != null ? '?sort='+localStorage.sort : '';
             };
 
         function Init()
@@ -110,7 +110,7 @@
     {
         let state = {
             RequestData: () => {
-                getData(`/tasks/${_pagination.CurrentPage()}?${_sort.getOrder()}`)
+                getData(`/tasks/${_pagination.CurrentPage()}${_sort.getOrder()}`)
                     .then(data => {
                         (data.items.length > 1 || data.pages > 1) ? _sort.Show() : _sort.Hide();
                         PopulateCards(data.items);
@@ -160,7 +160,8 @@
                                     state.RequestData();
                                 } else {
                                     fireToast(response.text);
-                                    this.checked = !this.checked;
+                                    lbtn.Update();
+                                    $('#loginModal').modal('show');
                                 }
                             });
                     });
@@ -202,6 +203,34 @@
         return state;
     };
 
+    const buttonInOut = (element, cb) =>
+    {
+        element.addEventListener('click', OnClick, false);
+
+        const Update = () => {
+            element.innerText = localStorage.isAdmin ? 'Sign Out' : 'Sign In';
+        };
+
+        function OnClick(e){
+            e.preventDefault();
+            if(localStorage.isAdmin){
+                getData('/logout')
+                    .then(r => {
+                        if(r.success){
+                            deleteAllCookies();
+                            localStorage.clear();
+                            Update();
+                            cb && cb();
+                        }
+                    });
+            } else {
+                $('#loginModal').modal('show');
+            }
+        }
+
+        return { Update };
+    };
+
     if(typeof (window.TasksManager) === 'undefined') {
         window.TasksManager = TasksManager;
     }
@@ -210,25 +239,7 @@
         let tasksManager = TasksManager();
         tasksManager.RequestData();
 
-        let btn = document.getElementById('btnLogin');
-        btn.innerText = localStorage.isAdmin ? 'Sign Out' : 'Sign In';
-        btn.addEventListener('click', function(e){
-            e.preventDefault();
-            if(localStorage.isAdmin){
-                getData('/logout')
-                    .then(r => {
-                        if(r.success){
-                            deleteAllCookies();
-                            localStorage.clear();
-                            btn.innerText = 'Sign In';
-                            tasksManager.RequestData();
-                        }
-                    });
-
-            } else {
-                $('#loginModal').modal('show');
-            }
-        });
+        window.lbtn = buttonInOut(document.getElementById('btnLogin'), _ => tasksManager.RequestData());
 
         // Fetch all the forms we want to apply custom Bootstrap validation styles to
         let forms = document.getElementsByClassName('needs-validation');
@@ -257,7 +268,7 @@
                                     if(data.success){
                                         $('#validationServer05').removeClass('is-invalid');
                                         localStorage.isAdmin = true;
-                                        btn.innerText = 'Sign Out';
+                                        lbtn.Update();
                                         fireToast("ADMIN IN DA HOUSE!");
                                         tasksManager.RequestData();
                                         $('#loginModal').modal('hide');
