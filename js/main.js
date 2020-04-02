@@ -124,6 +124,20 @@
             state.RequestData();
         };
 
+        const Revealed = (e) =>
+        {
+            e.target.removeEventListener('animationend', Revealed);
+            e.target.style.opacity = 1;
+            e.target.style.animationDelay = 0;
+        };
+
+        const Reveal = (item, i) =>
+        {
+            item.style.opacity = 0;
+            item.style.animationDelay = i * 100 + 'ms';
+            item.addEventListener('animationend', Revealed, false);
+        };
+
         const PopulateCards = items =>
         {
             _cardWrapper.innerText = '';
@@ -191,8 +205,8 @@
                     cardBody.appendChild(p);
                     cardBody.insertAdjacentHTML('beforeend', `<span class="badge badge-pill badge-secondary">${task.completed ? 'Done' : 'Uncompleted'}</span>`);
                 }
-                card.style.animationDelay = i * 100 + 'ms';
                 card.appendChild(cardBody);
+                Reveal(card, i);
                 _cardWrapper.appendChild(card);
             });
         };
