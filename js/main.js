@@ -127,8 +127,8 @@
         const PopulateCards = items =>
         {
             _cardWrapper.innerText = '';
-            items.map(task => {
-                let card = Object.assign(document.createElement('div'), {className: 'card mb-2 fadeInUp'}),
+            items.forEach( (task, i) => {
+                let card = Object.assign(document.createElement('div'), {className: 'card mb-2 cardReveal'}),
                     cardBody = Object.assign(document.createElement('div'), {className: 'card-body'}),
                     h5 = Object.assign(document.createElement('h5'), {className: 'card-title',
                         innerText: `${task.username} <${task.email}>`});
@@ -191,6 +191,7 @@
                     cardBody.appendChild(p);
                     cardBody.insertAdjacentHTML('beforeend', `<span class="badge badge-pill badge-secondary">${task.completed ? 'Done' : 'Uncompleted'}</span>`);
                 }
+                card.style.animationDelay = i * 100 + 'ms';
                 card.appendChild(cardBody);
                 _cardWrapper.appendChild(card);
             });
