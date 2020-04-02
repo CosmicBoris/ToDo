@@ -128,7 +128,7 @@
         {
             _cardWrapper.innerText = '';
             items.map(task => {
-                let card = Object.assign(document.createElement('div'), {className: 'card mb-2'}),
+                let card = Object.assign(document.createElement('div'), {className: 'card mb-2 fadeInUp'}),
                     cardBody = Object.assign(document.createElement('div'), {className: 'card-body'}),
                     h5 = Object.assign(document.createElement('h5'), {className: 'card-title',
                         innerText: `${task.username} <${task.email}>`});

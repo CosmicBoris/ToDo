@@ -62,12 +62,12 @@ class TasksController extends Controller
             if(isset($_SESSION['role']) && $_SESSION['role'] == 'admin'){
                 if($this->_model->updateTask($_POST)){
                     echo \json_encode(['success' => true, 'text' => 'Task updated']);
-                } else {
-                    echo \json_encode(['success' => false, 'text' => 'Error updating task']);
                 }
-            } else {
-                echo \json_encode(['success' => false, 'text' => 'Admin permission required']);
+                else
+                    echo \json_encode(['success' => false, 'text' => 'Error updating task']);
             }
+            else
+                echo \json_encode(['success' => false, 'text' => 'Admin permission required']);
         }
     }
 }
