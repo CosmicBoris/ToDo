@@ -12,7 +12,7 @@ final class DbHelper
 
     private function __construct()
     {
-        $this->_db = new \mysqli($_SERVER["SERVER_ADDR"], Config::DB_USER, Config::DB_PASS, Config::DB_NAME);
+        $this->_db = new \mysqli(Config::DB_HOST, Config::DB_USER, Config::DB_PASS, Config::DB_NAME);
 
         if($this->_db->connect_errno){
             trigger_error('MySQL connection error: (' . $this->_db->connect_errno . ') ' . $this->_db->connect_error);

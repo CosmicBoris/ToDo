@@ -10,5 +10,8 @@
     ],
     "autoload": {
         "psr-4": {"ToDo\\core\\": "core/", "ToDo\\": "src/"}
-    }
+    },
+  "require": {
+    "ext-json": "*"
+  }
 }

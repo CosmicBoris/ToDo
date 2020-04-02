@@ -11,19 +11,19 @@ final class TasksModel extends Model
         $db = $this->dbLink->getMySqli();
         if (!($stmt = $db->prepare(
             "SELECT id, username, email, content, completed, edited FROM tasks  ORDER BY $order LIMIT {$pars['limit']}"))){
-            throw  new \ErrorException("Не удалось подготовить запрос: (" . $db->errno . ") " . $db->error);
+            throw new \ErrorException("Не удалось подготовить запрос: (" . $db->errno . ") " . $db->error);
         }
         if (!$stmt->execute()){
-            throw  new \ErrorException("Не удалось выполнить запрос: (" . $stmt->errno . ") " . $stmt->error);
+            throw new \ErrorException("Не удалось выполнить запрос: (" . $stmt->errno . ") " . $stmt->error);
         }
         $result = $stmt->get_result();
-        $arr = [];
+        $tasks = [];
         while($row = $result->fetch_assoc()) {
-            $arr[] = $row;
+            $tasks[] = $row;
         }
 
         $stmt->close();
-        return $arr;
+        return $tasks;
     }
 
     function getTasksCount() : int
@@ -36,11 +36,11 @@ final class TasksModel extends Model
         $db = $this->dbLink->getMySqli();
 
         if (!($stmt = $db->prepare("INSERT INTO tasks (username, email, content) VALUES (?,?,?)"))){
-            throw  new \ErrorException("Не удалось подготовить запрос: (" . $db->errno . ") " . $db->error);
+            throw new \ErrorException("Не удалось подготовить запрос: (" . $db->errno . ") " . $db->error);
         }
         $stmt->bind_param("sss", $data['username'], $data['email'], $data['content']);
         if (!$stmt->execute()){
-            throw  new \ErrorException("Не удалось выполнить запрос: (" . $stmt->errno . ") " . $stmt->error);
+            throw new \ErrorException("Не удалось выполнить запрос: (" . $stmt->errno . ") " . $stmt->error);
         }
         $stmt->close();
     }
@@ -63,12 +63,12 @@ final class TasksModel extends Model
 
         $sql = "UPDATE tasks SET $set WHERE id=$id";
         if (!($stmt = $db->prepare($sql))){
-            throw  new \ErrorException("Не удалось подготовить запрос: (" . $db->errno . ") " . $db->error);
+            throw new \ErrorException("Не удалось подготовить запрос: (" . $db->errno . ") " . $db->error);
         }
         $types = str_repeat('s', count($arr));
         $stmt->bind_param($types, ...array_values($arr));
         if (!$stmt->execute()){
-            throw  new \ErrorException("Не удалось выполнить запрос: (" . $stmt->errno . ") " . $stmt->error);
+            throw new \ErrorException("Не удалось выполнить запрос: (" . $stmt->errno . ") " . $stmt->error);
         }
 
         $result = $stmt->affected_rows;

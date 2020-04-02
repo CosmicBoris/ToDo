@@ -14,10 +14,17 @@ class LoginController extends Controller
             header("Content-type: application/json");
             if(isset($_POST['login']) && isset($_POST['password'])){
                 $this->_model = new LoginModel();
-                echo \json_encode(['operation' => 'login',
-                    'success' => $this->_model->Login($_POST['login'], $_POST['password'])]);
+                try {
+                    $result = $this->_model->Login($_POST['login'], $_POST['password']);
+                }
+                catch (\ErrorException $e) {
+                    exit('Login model error');
+                }
+
+                echo \json_encode(['operation' => 'login', 'success' => $result]);
             }
-        } else
+        }
+        else
             parent::Show404();
     }
 }
