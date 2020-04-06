@@ -17,7 +17,7 @@ final class TasksModel extends Model
         ];
 
         if(isset($pars['sort']) && array_key_exists($pars['sort'], $sortOptions)){
-            $order = $pars['sort'];
+            $order = $sortOptions[$pars['sort']];
         }
         else
             $order = 'completed DESC';
