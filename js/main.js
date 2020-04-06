@@ -65,6 +65,7 @@
             _currentValue = null;
 
         const
+            ACTIVE_ITEM_CLASS = 'active',
             Show = _ => {
                 _itemsHolder.parentElement.style.visibility = "visible";
             },
@@ -79,8 +80,15 @@
         {
             _itemsHolder = document.getElementById("dropdownItemsHolder");
             if(localStorage.sort){
-                _itemsHolder.querySelector("button.active").classList.remove('active');
-                _itemsHolder.querySelector(`button[data-rule="${localStorage.sort}"]`).classList.add('active');
+                let item = _itemsHolder.querySelector(`button[data-rule="${localStorage.sort}"]`);
+                if(item){
+                    _itemsHolder.querySelector("button."+ACTIVE_ITEM_CLASS).classList.remove(ACTIVE_ITEM_CLASS);
+                    item.classList.add(ACTIVE_ITEM_CLASS);
+                }
+                else{
+                    item = _itemsHolder.querySelector("button."+ACTIVE_ITEM_CLASS);
+                    localStorage.sort = item.getAttribute('data-rule');
+                }
             }
             InitEvents();
         }
