@@ -14,7 +14,6 @@ class TasksController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->_model = new TasksModel();
         paginationHelper::setItemsPerPage(3);
     }
 
@@ -24,12 +23,18 @@ class TasksController extends Controller
         paginationHelper::setCurrentPage(Router::getUriSegment(1));
 
         if(Request::isAjax()){
-            $tasksCount = $this->_model->getTasksCount();
+            $model = new TasksModel();
+            $tasksCount = $model->getTasksCount();
             $this->pages = ceil($tasksCount / 3);
             $this->items = [];
             if($tasksCount > 0){
-                $this->items  = $this->_model->getTasks(['sort' => $_GET['sort'],
-                    'limit' => paginationHelper::LimitString()]);
+                try{
+                    $this->items = $model->getTasks(['sort' => $_GET['sort'], 'limit' => paginationHelper::LimitString()]);
+                }
+                catch (\ErrorException $e){
+                    $this->success = false;
+                    $this->error = $e->getMessage();
+                }
             }
             header("Content-type: application/json");
             echo \json_encode($this->_shared_storage);
