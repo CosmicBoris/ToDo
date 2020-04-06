@@ -7,18 +7,32 @@ final class TasksModel extends Model
 {
     function getTasks($pars) : array
     {
-        $order = $pars['sort'] ?? "completed DESC";
+        $sortOptions = [
+            'sa' => 'completed ASC',
+            'sd' => 'completed DESC',
+            'ua' => 'username ASC',
+            'ud' => 'username DESC',
+            'ea' => 'email ASC',
+            'ed' => 'email DESC',
+        ];
+
+        if(isset($pars['sort']) && array_key_exists($pars['sort'], $sortOptions)){
+            $order = $pars['sort'];
+        }
+        else
+            $order = 'completed DESC';
+
         $db = $this->dbLink->getMySqli();
         if (!($stmt = $db->prepare(
-            "SELECT id, username, email, content, completed, edited FROM tasks  ORDER BY $order LIMIT {$pars['limit']}"))){
+            "SELECT id, username, email, content, completed, edited FROM tasks ORDER BY $order LIMIT {$pars['limit']}"))){
             throw new \ErrorException("Не удалось подготовить запрос: (" . $db->errno . ") " . $db->error);
         }
         if (!$stmt->execute()){
             throw new \ErrorException("Не удалось выполнить запрос: (" . $stmt->errno . ") " . $stmt->error);
         }
-        $result = $stmt->get_result();
+        $r = $stmt->get_result();
         $tasks = [];
-        while($row = $result->fetch_assoc()) {
+        while($row = $r->fetch_assoc()) {
             $tasks[] = $row;
         }
 
