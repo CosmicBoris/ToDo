@@ -23,14 +23,17 @@ final class TasksModel extends Model
             $order = 'completed DESC';
 
         $db = $this->dbLink->getMySqli();
-        if (!($stmt = $db->prepare(
-            "SELECT id, username, email, content, completed, edited FROM tasks ORDER BY $order LIMIT {$pars['limit']}"))){
+
+        $query = "SELECT id, username, email, content, completed, edited FROM tasks ORDER BY $order LIMIT {$pars['limit']}";
+
+        if (!($stmt = $db->prepare($query))){
             throw new \ErrorException("Не удалось подготовить запрос: (" . $db->errno . ") " . $db->error);
         }
         if (!$stmt->execute()){
             throw new \ErrorException("Не удалось выполнить запрос: (" . $stmt->errno . ") " . $stmt->error);
         }
         $r = $stmt->get_result();
+
         $tasks = [];
         while($row = $r->fetch_assoc()) {
             $tasks[] = $row;
