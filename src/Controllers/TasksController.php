@@ -67,11 +67,16 @@ class TasksController extends Controller
         if(Request::isPost()){
             header("Content-type: application/json");
             if(isset($_SESSION['role']) && $_SESSION['role'] == 'admin'){
-                if($this->_model->updateTask($_POST)){
-                    echo \json_encode(['success' => true, 'text' => 'Task updated']);
+                try{
+                    if($this->_model->updateTask($_POST)){
+                        echo \json_encode(['success' => true, 'text' => 'Task updated']);
+                    }
+                    else
+                        echo \json_encode(['success' => false, 'text' => 'Error updating task']);
                 }
-                else
-                    echo \json_encode(['success' => false, 'text' => 'Error updating task']);
+                catch (\ErrorException $exception) {
+                    echo \json_encode(['success' => false, 'text' => $exception->getMessage()]);
+                }
             }
             else
                 echo \json_encode(['success' => false, 'text' => 'Admin permission required']);
