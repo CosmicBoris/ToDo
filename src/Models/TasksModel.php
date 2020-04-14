@@ -74,7 +74,8 @@ final class TasksModel extends Model
         $i = 0;
         $set = '';
         foreach($arr as $key => $value) {
-            if(++$i > 1) $set.=', ';
+            if(++$i > 1)
+                $set.=', ';
             $set .= "$key=?";
         }
 

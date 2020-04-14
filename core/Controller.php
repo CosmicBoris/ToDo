@@ -5,7 +5,6 @@ namespace ToDo\core;
 abstract class Controller
 {
     protected
-        $_model,
         $_view,
         $_shared_storage;
 

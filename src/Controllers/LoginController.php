@@ -13,9 +13,9 @@ class LoginController extends Controller
         if(Request::isPost()){
             header("Content-type: application/json");
             if(isset($_POST['login']) && isset($_POST['password'])){
-                $this->_model = new LoginModel();
+                $model = new LoginModel();
                 try {
-                    $result = $this->_model->Login($_POST['login'], $_POST['password']);
+                    $result = $model->Login($_POST['login'], $_POST['password']);
                 }
                 catch (\ErrorException $e) {
                     exit('Login model error');

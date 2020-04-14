@@ -11,10 +11,13 @@ use ToDo\Models\TasksModel;
 
 class TasksController extends Controller
 {
+    private $_model;
+
     public function __construct()
     {
         parent::__construct();
         paginationHelper::setItemsPerPage(3);
+        $this->_model = new TasksModel();
     }
 
     public function actionIndex()
@@ -23,13 +26,12 @@ class TasksController extends Controller
         paginationHelper::setCurrentPage(Router::getUriSegment(1));
 
         if(Request::isAjax()){
-            $model = new TasksModel();
-            $tasksCount = $model->getTasksCount();
+            $tasksCount = $this->_model->getTasksCount();
             $this->pages = ceil($tasksCount / 3);
             $this->items = [];
             if($tasksCount > 0){
                 try{
-                    $this->items = $model->getTasks(['sort' => $_GET['sort'], 'limit' => paginationHelper::LimitString()]);
+                    $this->items = $this->_model->getTasks(['sort' => $_GET['sort'], 'limit' => paginationHelper::LimitString()]);
                 }
                 catch (\ErrorException $e){
                     $this->success = false;
