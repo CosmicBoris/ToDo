@@ -8,7 +8,7 @@ class Config
     const DEFAULT_ACTION     = "Index";
 
     const LAYOUT_DIR         = "layouts/";
-    const STYLES_DIR         = "/css/";
+    const STYLES_DIR         = "/assets/css/";
     const MAIN_LAYOUT        = "index";
     const LAYOUT_TYPE        = ".phtml";
 
