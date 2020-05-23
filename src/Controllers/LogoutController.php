@@ -2,7 +2,6 @@
 
 namespace ToDo\Controllers;
 
-
 use ToDo\core\Controller;
 
 class LogoutController extends Controller

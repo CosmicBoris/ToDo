@@ -1,22 +1,8 @@
-@keyframes grain {
-    0%, 100% { transform:translate(0, 0); }
-    10% { transform:translate(-5%, -10%); }
-    20% { transform:translate(-15%, 5%); }
-    30% { transform:translate(7%, -25%); }
-    40% { transform:translate(-5%, 25%); }
-    50% { transform:translate(-15%, 10%); }
-    60% { transform:translate(15%, 0%); }
-    70% { transform:translate(0%, 15%); }
-    80% { transform:translate(3%, 35%); }
-    90% { transform:translate(-10%, 10%); }
-}
-
-@keyframes cardReveal {
+@keyframes cardAnim {
     from {
         opacity: 0;
         transform: translate3d(0, -30%, 0) scale(.88);
     }
-
     to {
         opacity: 1;
         transform: translate3d(0, 0, 0) scale(1);
@@ -24,9 +10,9 @@
 }
 
 .cardReveal {
-    animation-name: cardReveal;
+    animation-name: cardAnim;
     animation-duration: .4s;
-    animation-timing-function: cubic-bezier(.18,.89,.32,1.28);
+    animation-timing-function: cubic-bezier(.18, .89, .32, 1.28);
 }
 
 #apptoast{
@@ -46,20 +32,11 @@
     justify-content: center;
     align-items: center;
 }
-
 #cardsWrapper.spinner-grow{
     width: 3rem;
     height: 3rem;
 }
 
-main::before {
-    animation: grain 8s steps(10) infinite;
-    background-image: url(../img/noise.png);
-    content: '';
-    height: 300%;
-    left: -50%;
-    opacity: 0.6;
-    position: fixed;
-    top: -100%;
-    width: 300%;
+.page-item:not(.active) {
+    cursor: pointer;
 }

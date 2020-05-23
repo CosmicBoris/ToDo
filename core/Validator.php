@@ -9,8 +9,7 @@ final class Validator
     private $_required_fields;
     private $_errors = array();
 
-    private function __construct()
-    {}
+    private function __construct(){ }
 
     public static function getInstance()
     {
@@ -29,14 +28,14 @@ final class Validator
 
     public function CheckForEmpty()
     {
-        if(is_array($this->_required_fields) && !empty($this->_required_fields)){
-            foreach($this->_required_fields as $key){
+        if(!empty($this->_required_fields) && is_array($this->_required_fields)) {
+            foreach($this->_required_fields as $key) {
                 if(is_null($this->_data[$key]))
                     $this->_errors['empty'][] = $key;
             }
         } else {
-            foreach((array)$this->_data as $key => $value){
-                if(empty($value)){
+            foreach((array)$this->_data as $key => $value) {
+                if(empty($value)) {
                     $this->_errors['empty'][] = $key;
                 }
             }
@@ -70,7 +69,7 @@ final class Validator
     {
         if(is_array($data)){
             foreach($data as $key => $value){
-                if (is_array($ignored)) { // we have keys to ignore
+                if(is_array($ignored)) { // we have keys to ignore
                     if(!in_array($key, $ignored)) { // if key that we don`t ignore
                         $data[$key] = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
                     }

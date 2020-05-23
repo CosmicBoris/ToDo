@@ -21,7 +21,7 @@ abstract class Controller
     public function Show404()
     {
         http_response_code(404);
-        include_once Config::LAYOUT_DIR.'NotFound'.Config::LAYOUT_TYPE;
+        include_once Config::LAYOUT_DIR . '404.html';
     }
 
     public function __set($name, $value)

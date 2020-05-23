@@ -5,15 +5,23 @@ use ToDo\core\Model;
 
 final class TasksModel extends Model
 {
-    function getTasks($pars) : array
+    function addTask($data): void
     {
-        $sortOptions = [
-            'sa' => 'completed ASC',
-            'sd' => 'completed DESC',
-            'ua' => 'username ASC',
-            'ud' => 'username DESC',
-            'ea' => 'email ASC',
-            'ed' => 'email DESC',
+        $db = $this->dbLink->getMySqli();
+
+        if(!($stmt = $db->prepare("INSERT INTO tasks (username, email, content) VALUES (?,?,?)"))) {
+            throw new \ErrorException("Не удалось подготовить запрос: (" . $db->errno . ") " . $db->error);
+        }
+        $stmt->bind_param("sss", $data['username'], $data['email'], $data['content']);
+        if(!$stmt->execute()) {
+            throw new \ErrorException("Не удалось выполнить запрос: (" . $stmt->errno . ") " . $stmt->error);
+        }
+        $stmt->close();
+    }
+
+    function getTasks($pars): array
+    {
+        $sortOptions = ['sa' => 'completed ASC', 'sd' => 'completed DESC', 'ua' => 'username ASC', 'ud' => 'username DESC', 'ea' => 'email ASC', 'ed' => 'email DESC',
         ];
 
         if(isset($pars['sort']) && array_key_exists($pars['sort'], $sortOptions)){
@@ -48,21 +56,7 @@ final class TasksModel extends Model
         return $this->dbLink->getCount('tasks', 'id');
     }
 
-    function addTask($data)
-    {
-        $db = $this->dbLink->getMySqli();
-
-        if (!($stmt = $db->prepare("INSERT INTO tasks (username, email, content) VALUES (?,?,?)"))){
-            throw new \ErrorException("Не удалось подготовить запрос: (" . $db->errno . ") " . $db->error);
-        }
-        $stmt->bind_param("sss", $data['username'], $data['email'], $data['content']);
-        if (!$stmt->execute()){
-            throw new \ErrorException("Не удалось выполнить запрос: (" . $stmt->errno . ") " . $stmt->error);
-        }
-        $stmt->close();
-    }
-
-    function updateTask($arr)
+    function updateTask($arr): int
     {
         $id = $arr['id'];
         unset($arr['id']);

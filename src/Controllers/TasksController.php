@@ -12,11 +12,12 @@ use ToDo\Models\TasksModel;
 class TasksController extends Controller
 {
     private $_model;
+    const ITEMS_PER_PAGE = 3;
 
     public function __construct()
     {
         parent::__construct();
-        paginationHelper::setItemsPerPage(3);
+        paginationHelper::setItemsPerPage(self::ITEMS_PER_PAGE);
         $this->_model = new TasksModel();
     }
 
@@ -27,22 +28,20 @@ class TasksController extends Controller
 
         if(Request::isAjax()){
             $tasksCount = $this->_model->getTasksCount();
-            $this->pages = ceil($tasksCount / 3);
+            $this->pages = ceil($tasksCount / self::ITEMS_PER_PAGE);
             $this->items = [];
             if($tasksCount > 0){
-                try{
+                try {
                     $this->items = $this->_model->getTasks(['sort' => $_GET['sort'], 'limit' => paginationHelper::LimitString()]);
-                }
-                catch (\ErrorException $e){
+                } catch (\ErrorException $e) {
                     $this->success = false;
                     $this->error = $e->getMessage();
                 }
             }
             header("Content-type: application/json");
             echo \json_encode($this->_shared_storage);
-        } else {
+        } else
             $this->_view->Render();
-        }
     }
 
     public function actionAdd()
@@ -52,11 +51,12 @@ class TasksController extends Controller
             $keys = ['username', 'email', 'content'];
             $result = false;
             $v = Validator::getInstance()->Prepare($_POST, $keys)->CheckForEmpty();
-            if(!$v->hasErrors() && $v->CheckEmail('email')){
+            if(!$v->hasErrors() && $v->CheckEmail('email')) {
                 try {
                     $this->_model->addTask($v->getRequiredFields());
                     $result = true;
-                } catch (\ErrorException $e){}
+                } catch (\ErrorException $e) {
+                }
             }
             echo \json_encode(['operation' => 'add' ,'success' => $result]);
         }

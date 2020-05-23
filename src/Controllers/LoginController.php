@@ -20,7 +20,6 @@ class LoginController extends Controller
                 catch (\ErrorException $e) {
                     exit('Login model error');
                 }
-
                 echo \json_encode(['operation' => 'login', 'success' => $result]);
             }
         }
