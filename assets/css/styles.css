@@ -1,3 +1,12 @@
+:root {
+    --card-background-color: rgb(251, 251, 251);
+    --card-shadow-color: rgba(0, 32, 128, 0.1);
+}
+
+body {
+    background-color: #9fb6bb21;
+}
+
 @keyframes cardAnim {
     from {
         opacity: 0;
@@ -9,13 +18,19 @@
     }
 }
 
+.card {
+    background-color: var(--card-background-color);
+    box-shadow: 0 1px 2px var(--card-shadow-color);
+    border-top: 1px solid white;
+}
+
 .cardReveal {
     animation-name: cardAnim;
     animation-duration: .4s;
     animation-timing-function: cubic-bezier(.18, .89, .32, 1.28);
 }
 
-#apptoast{
+#apptoast {
     position: absolute;
     top: 5rem;
     right: 1.5rem;

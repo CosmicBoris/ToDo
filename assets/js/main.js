@@ -28,7 +28,6 @@ class ButtonInOut {
             } else
                 $('#loginModal').modal('show');
         };
-
         this.btn.addEventListener('click', this.onclickFn, false);
     }
 
@@ -41,7 +40,7 @@ const Pagination = (container, callbackFn) => {
     let _pagesCount = 0, currentPage = 1;
 
     const
-        Update = _ => {
+        update = _ => {
             while(ul.firstChild)
                 ul.removeChild(ul.firstChild);
             if(_pagesCount < 2)
@@ -55,7 +54,7 @@ const Pagination = (container, callbackFn) => {
             let page = parseInt(e.target.innerText);
             if(currentPage !== page) {
                 currentPage = page;
-                Update();
+                update();
                 callbackFn && callbackFn(currentPage);
             }
         };
@@ -70,26 +69,16 @@ const Pagination = (container, callbackFn) => {
         hide: _ => { ul.style.visibility = "hidden"; },
         set setPages(value){
             _pagesCount = value;
-            Update();
+            update();
         },
         get currentPage(){ return currentPage; }
     };
 };
 
 const Sort = callbackFn => {
-    let _itemsHolder = null,
-        _currentValue = null;
-    const
-        ACTIVE_ITEM_CLASS = 'active',
-        Show = _ => {
-            _itemsHolder.parentElement.style.visibility = "visible";
-        },
-        Hide = _ => {
-            _itemsHolder.parentElement.style.visibility = "hidden";
-        },
-        getOrder = _ => {
-            return localStorage.sort != null ? '?sort=' + localStorage.sort : '';
-        };
+    let _itemsHolder = null;
+
+    const ACTIVE_ITEM_CLASS = 'active';
 
     function init(){
         _itemsHolder = document.getElementById("dropdownItemsHolder");
@@ -114,90 +103,116 @@ const Sort = callbackFn => {
         let val = e.target.getAttribute('data-rule');
         if(localStorage.sort !== val) {
             localStorage.sort = val;
-            _itemsHolder.querySelector("button.active").classList.remove('active');
-            e.target.classList.add("active");
+            _itemsHolder.querySelector("button.active").classList.remove(ACTIVE_ITEM_CLASS);
+            e.target.classList.add(ACTIVE_ITEM_CLASS);
             callbackFn && callbackFn();
         }
     }
 
     init();
-    return {Show, Hide, getOrder};
+
+    return {
+        show: _ => {
+            _itemsHolder.parentElement.style.visibility = "visible";
+        },
+        hide: _ => {
+            _itemsHolder.parentElement.style.visibility = "hidden";
+        },
+        getOrder: _ => {
+            return localStorage.sort != null ? '?sort=' + localStorage.sort : '';
+        }
+    };
+};
+
+const createElement = function(name, attributes){
+    let node = document.createElement(name);
+    for(let attr in attributes){
+        if(attributes.hasOwnProperty(attr))
+            node.setAttribute(attr, attributes[attr]);
+    }
+    for(let i = 2; i < arguments.length; i++){
+        let child = arguments[i];
+        if(typeof child === 'string')
+            child = document.createTextNode(child);
+        node.appendChild(child);
+    }
+    return node;
 };
 
 const TasksManager = () => {
-    let state = {
-        RequestData: () => {
-            getData(`/tasks/${_pagination.currentPage}${_sort.getOrder()}`)
-                .then(data => {
-                    data.items.length > 1 || data.pages > 1 ? _sort.Show() : _sort.Hide();
-                    PopulateCards(data.items);
-                    _pagination.setPages = data.pages;
-                });
-        }
+    const onPageChanged = (page) => {
+        state.requestData();
     };
-    const OnPageChanged = (page) => {
-        state.RequestData();
-    };
-    const Revealed = (e) => {
-        e.target.removeEventListener('animationend', Revealed);
+    const revealed = e => {
+        e.target.removeEventListener('animationend', revealed);
         e.target.style.opacity = 1;
         e.target.style.animationDelay = 0;
     };
-    const Reveal = (item, i) => {
+    const reveal = (item, i) => {
         item.style.opacity = 0;
         item.style.animationDelay = i * 100 + 'ms';
-        item.addEventListener('animationend', Revealed, false);
+        item.addEventListener('animationend', revealed, false);
     };
-    const PopulateCards = items => {
-        _cardWrapper.innerText = '';
+    const populateCards = items => {
+        while(_cardWrapper.firstChild){
+            _cardWrapper.removeChild(_cardWrapper.firstChild);
+        }
+
         items.forEach((task, i) => {
-            let card = Object.assign(document.createElement('div'), {className: 'card mb-2 cardReveal'}),
-                cardBody = Object.assign(document.createElement('div'), {className: 'card-body'}),
-                h5 = Object.assign(document.createElement('h5'), {
-                    className: 'card-title',
-                    innerText: `${task.username} <${task.email}>`
-                });
-            cardBody.appendChild(h5);
-            let text = document.createElement("textarea");
-            text.className = "form-control";
-            text.setAttribute('name', 'content');
-            text.setAttribute('rows', '1');
-            text.innerHTML = task.content;
+
+            let card = createElement('div', {class: 'card mb-2 cardReveal', 'data-id': task.id},
+                createElement('div', {class: 'card-body'},
+                    createElement('h5', {class: 'card-title'}, `${task.username} <${task.email}>`)));
+
+            let cardBody = card.firstChild;
+
+
             if(task.edited)
                 cardBody.insertAdjacentHTML('afterbegin', `<span class="badge badge-warning float-right">Edited by admin</span>`);
+
             if(localStorage.isAdmin) {
-                card.setAttribute("data-id", task.id);
+                let text = createElement('textarea', {
+                    className: 'form-control',
+                    name: 'content',
+                    rows: '1'
+                }, task.content);
                 cardBody.appendChild(text);
-                let btn = document.createElement('button');
-                btn.className = "btn btn-primary btn-sm float-right mt-1";
-                btn.innerHTML = 'Update';
+
+                let btn = createElement('button', {className: "btn btn-primary btn-sm float-right mt-1"}, 'Update');
                 btn.addEventListener('click', function(){
                     btn.insertAdjacentHTML('afterbegin', '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
                     postData('/tasks/update/', `id=${task.id}&content=${text.value}`)
-                        .then(response => {
-                            btn.innerHTML = 'Update';
-                            if(response.success) {
-                                fireToast(response.text);
-                                state.RequestData();
+                        .then(R => {
+                            btn.removeChild(btn.firstChild);
+                            if(R.success) {
+                                fireToast(R.text);
+                                state.requestData();
                             } else {
-                                fireToast(response.text);
-                                lbtn.Update();
+                                fireToast(R.text);
+                                lbtn.update();
                                 $('#loginModal').modal('show');
                             }
                         });
                 });
                 cardBody.appendChild(btn);
-                cardBody.insertAdjacentHTML('beforeend',
-                    `<div class="custom-control custom-checkbox float-left">
-                           <input type="checkbox" class="custom-control-input" id="cb${task.id}"${task.completed ? ' checked' : ''}>
-                           <label class="custom-control-label" for="cb${task.id}">set completed</label>
-                       </div>`);
+                cardBody.appendChild(
+                    createElement('div', {className: "custom-control custom-checkbox float-left"},
+                        createElement('input', {
+                            type: "checkbox",
+                            id: 'cb' + task.id,
+                            className: "custom-control-input"
+                        }),
+                        createElement('label', {className: "custom-control-label", for: 'cb' + task.id}, 'Done'))
+                );
+                if(task.completed)
+                    cardBody.querySelector('input').checked = true;
+
                 cardBody.lastElementChild.firstElementChild.addEventListener('click', function(e){
                     postData('/tasks/update/', `id=${task.id}&completed=${Number(this.checked)}`)
                         .then(response => {
                             if(response.success) {
                                 fireToast(response.text);
-                                state.RequestData();
+                                state.requestData();
                             } else {
                                 fireToast(response.text);
                                 this.checked = !this.checked;
@@ -205,19 +220,29 @@ const TasksManager = () => {
                         });
                 });
             } else {
-                let p = Object.assign(document.createElement('p'), {className: 'card-text'});
-                p.innerText = text.textContent;
-                cardBody.appendChild(p);
+                cardBody.appendChild(createElement('p', {className: 'card-text'}, task.content));
                 cardBody.insertAdjacentHTML('beforeend', `<span class="badge badge-pill badge-secondary">${task.completed ? 'Done' : 'Uncompleted'}</span>`);
             }
-            card.appendChild(cardBody);
-            Reveal(card, i);
+            reveal(card, i);
             _cardWrapper.appendChild(card);
         });
     };
+
+    let state = {
+        requestData: () => {
+            getData(`/tasks/${_pagination.currentPage}${_sort.getOrder()}`)
+                .then(data => {
+                    data.items.length > 1 || data.pages > 1 ? _sort.show() : _sort.hide();
+                    populateCards(data.items);
+                    _pagination.setPages = data.pages;
+                });
+        }
+    };
+
     let _cardWrapper = document.getElementById('cardsWrapper');
-    let _pagination = Pagination(document.getElementById('pagination'), OnPageChanged);
-    let _sort = Sort(state.RequestData);
+    let _pagination = Pagination(document.getElementById('pagination'), onPageChanged);
+    let _sort = Sort(state.requestData);
+
     return state;
 };
 
@@ -255,51 +280,55 @@ function deleteAllCookies(){
     });
 }
 
-window.addEventListener('load', function(){
-    let tasksManager = TasksManager();
-    tasksManager.RequestData();
-    window.lbtn = new ButtonInOut(() => tasksManager.RequestData());
+const tasksManager = TasksManager();
+
+window.addEventListener('load', () => {
+    tasksManager.requestData();
+    window.lbtn = new ButtonInOut(() => tasksManager.requestData());
+
     // Fetch all the forms we want to apply custom Bootstrap validation styles to
     let forms = document.getElementsByClassName('needs-validation');
+
     // Loop over them and prevent submission
-    let validation = Array.prototype.filter.call(forms, function(form){
-        form.addEventListener('submit', function(event){
-            event.preventDefault();
-            event.stopPropagation();
-            if(form.checkValidity() === true) {
-                switch(form.id){
-                    case 'new_task':
-                        postData('/tasks/add', $(form).serialize())
-                            .then(data => {
-                                if(data.success) {
-                                    tasksManager.RequestData();
-                                    fireToast("Success, task added!");
-                                    $('#collapseOne').collapse('hide');
-                                    form.classList.remove('was-validated');
-                                    $(form).find("input[type=text], input[type=email], textarea").val("");
-                                }
-                            });
-                        break;
-                    case 'loginForm':
-                        postData('/login', $(form).serialize())
-                            .then(data => {
-                                if(data.success) {
-                                    $('#validationServer05').removeClass('is-invalid');
-                                    localStorage.isAdmin = true;
-                                    lbtn.update();
-                                    fireToast("ADMIN IN DA HOUSE!");
-                                    tasksManager.RequestData();
-                                    $('#loginModal').modal('hide');
-                                    form.classList.remove('was-validated');
-                                    $(form).find("input[type=text], input[type=password]").val("");
-                                } else {
-                                    $('#validationServer05').addClass('is-invalid');
-                                }
-                            });
-                        break;
-                }
-            } else {
+    Array.prototype.filter.call(forms, function(form){
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            if(!form.checkValidity()) {
                 form.classList.add('was-validated');
+                return;
+            }
+
+            switch(form.id){
+                case 'new_task':
+                    postData('/tasks/add', $(form).serialize())
+                        .then(data => {
+                            if(data.success) {
+                                tasksManager.requestData();
+                                fireToast("Success, task added!");
+                                $('#collapseOne').collapse('hide');
+                                form.classList.remove('was-validated');
+                                $(form).find("input[type=text], input[type=email], textarea").val("");
+                            }
+                        });
+                    break;
+                case 'loginForm':
+                    postData('/login', $(form).serialize())
+                        .then(data => {
+                            if(data.success) {
+                                $('#validationServer05').removeClass('is-invalid');
+                                localStorage.isAdmin = true;
+                                lbtn.update();
+                                fireToast("ADMIN IN DA HOUSE!");
+                                tasksManager.requestData();
+                                $('#loginModal').modal('hide');
+                                form.classList.remove('was-validated');
+                                $(form).find("input[type=text], input[type=password]").val("");
+                            } else {
+                                $('#validationServer05').addClass('is-invalid');
+                            }
+                        });
+                    break;
             }
         }, false);
     });

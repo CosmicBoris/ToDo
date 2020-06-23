@@ -14,8 +14,7 @@ final class DbHelper
         $this->_db = new \mysqli(Config::DB_HOST, Config::DB_USER, Config::DB_PASS, Config::DB_NAME);
 
         if($this->_db->connect_errno){
-            trigger_error('MySQL connection error: (' . $this->_db->connect_errno . ') ' . $this->_db->connect_error);
-            exit();
+            trigger_error('MySQL connection error: (' . $this->_db->connect_errno . ') ' . $this->_db->connect_error, E_USER_ERROR);
         }
 
         $this->_db->set_charset("utf-8");

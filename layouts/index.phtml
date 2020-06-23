@@ -11,10 +11,10 @@
     <link rel="stylesheet" href="<?= Config::STYLES_DIR ?>styles.css">
 </head>
 <body>
-<div class="d-flex d-flex justify-content-between p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+<header class="d-flex d-flex justify-content-between p-3 px-md-4 mb-3 bg-white border-bottom">
     <h3 class="my-0 mr-md-auto font-weight-normal">Tasks</h3>
     <a id="btnLogin" class="btn btn-outline-primary" href="#"></a>
-</div>
+</header>
 <!-- Modal -->
 <div class="modal fade" id="loginModal" data-backdrop="static" tabindex="-1" role="dialog"
      aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -54,7 +54,7 @@
         </div>
     </div>
 </div>
-<?php include_once $this->_page_content; ?>
+<?php include $this->_page_content; ?>
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
         integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
         crossorigin="anonymous"></script>
