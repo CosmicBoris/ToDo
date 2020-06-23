@@ -189,7 +189,7 @@ const TasksManager = () => {
                                 state.requestData();
                             } else {
                                 fireToast(R.text);
-                                lbtn.update();
+                                btnLogin.update();
                                 $('#loginModal').modal('show');
                             }
                         });
@@ -266,34 +266,33 @@ async function getData(url = ''){
     return await response.json();
 }
 
-function fireToast(massage){
+const fireToast = (massage) => {
     let t = $('#apptoast');
     t.find(".toast-body").text(massage);
     t.toast('show');
-}
+};
 
-function deleteAllCookies(){
+const deleteAllCookies = () => {
     document.cookie.split(";").forEach(cookie => {
         let eqPos = cookie.indexOf("=");
         let name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
         document.cookie = name + "=;expires=Thu, 01 Jan 2000 00:00:00 GMT";
     });
-}
+};
 
 const tasksManager = TasksManager();
+const btnLogin = new ButtonInOut(() => tasksManager.requestData());
 
 window.addEventListener('load', () => {
     tasksManager.requestData();
-    window.lbtn = new ButtonInOut(() => tasksManager.requestData());
 
     // Fetch all the forms we want to apply custom Bootstrap validation styles to
     let forms = document.getElementsByClassName('needs-validation');
-
-    // Loop over them and prevent submission
     Array.prototype.filter.call(forms, function(form){
         form.addEventListener('submit', e => {
             e.preventDefault();
             e.stopPropagation();
+
             if(!form.checkValidity()) {
                 form.classList.add('was-validated');
                 return;
@@ -308,7 +307,7 @@ window.addEventListener('load', () => {
                                 fireToast("Success, task added!");
                                 $('#collapseOne').collapse('hide');
                                 form.classList.remove('was-validated');
-                                $(form).find("input[type=text], input[type=email], textarea").val("");
+                                form.reset();
                             }
                         });
                     break;
@@ -318,12 +317,12 @@ window.addEventListener('load', () => {
                             if(data.success) {
                                 $('#validationServer05').removeClass('is-invalid');
                                 localStorage.isAdmin = true;
-                                lbtn.update();
+                                btnLogin.update();
                                 fireToast("ADMIN IN DA HOUSE!");
                                 tasksManager.requestData();
                                 $('#loginModal').modal('hide');
                                 form.classList.remove('was-validated');
-                                $(form).find("input[type=text], input[type=password]").val("");
+                                form.reset();
                             } else {
                                 $('#validationServer05').addClass('is-invalid');
                             }
