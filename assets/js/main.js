@@ -22,7 +22,8 @@ class ButtonInOut {
                         deleteAllCookies();
                         localStorage.clear();
                         this.update();
-                        this.cbFn && this.cbFn();
+                        if(typeof this.cbFn === "function")
+                            this.cbFn();
                     }
                 });
             } else
@@ -32,12 +33,13 @@ class ButtonInOut {
     }
 
     update(){
-        this.btn.innerText = localStorage.isAdmin ? 'Sign Out' : 'Sign In';
+        this.btn.innerText = localStorage.isAdmin ? 'Sign Out' : 'Login';
     }
 }
 
 const Pagination = (container, callbackFn) => {
-    let _pagesCount = 0, currentPage = 1;
+    let _pagesCount = 0,
+        currentPage = 1;
 
     const
         update = _ => {
@@ -166,19 +168,18 @@ const TasksManager = () => {
 
             let cardBody = card.firstChild;
 
-
             if(task.edited)
                 cardBody.insertAdjacentHTML('afterbegin', `<span class="badge badge-warning float-right">Edited by admin</span>`);
 
             if(localStorage.isAdmin) {
                 let text = createElement('textarea', {
-                    className: 'form-control',
+                    class: 'form-control',
                     name: 'content',
                     rows: '1'
                 }, task.content);
                 cardBody.appendChild(text);
 
-                let btn = createElement('button', {className: "btn btn-primary btn-sm float-right mt-1"}, 'Update');
+                let btn = createElement('button', {class: "btn btn-primary btn-sm float-right mt-1"}, 'Update');
                 btn.addEventListener('click', function(){
                     btn.insertAdjacentHTML('afterbegin', '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
                     postData('/tasks/update/', `id=${task.id}&content=${text.value}`)
@@ -196,13 +197,13 @@ const TasksManager = () => {
                 });
                 cardBody.appendChild(btn);
                 cardBody.appendChild(
-                    createElement('div', {className: "custom-control custom-checkbox float-left"},
+                    createElement('div', {class: "custom-control custom-checkbox float-left"},
                         createElement('input', {
                             type: "checkbox",
                             id: 'cb' + task.id,
-                            className: "custom-control-input"
+                            class: "custom-control-input"
                         }),
-                        createElement('label', {className: "custom-control-label", for: 'cb' + task.id}, 'Done'))
+                        createElement('label', {class: "custom-control-label", for: 'cb' + task.id}, 'Done'))
                 );
                 if(task.completed)
                     cardBody.querySelector('input').checked = true;
@@ -280,6 +281,14 @@ const deleteAllCookies = () => {
     });
 };
 
+const formToQueryString = form => {
+    let props = [];
+    new FormData(form).forEach((value, key) => {
+        props.push(encodeURIComponent(key) + "=" + encodeURIComponent(value));
+    });
+    return props.join('&');
+};
+
 const tasksManager = TasksManager();
 const btnLogin = new ButtonInOut(() => tasksManager.requestData());
 
@@ -300,7 +309,7 @@ window.addEventListener('load', () => {
 
             switch(form.id){
                 case 'new_task':
-                    postData('/tasks/add', $(form).serialize())
+                    postData('/tasks/add', formToQueryString(form))
                         .then(data => {
                             if(data.success) {
                                 tasksManager.requestData();
@@ -312,7 +321,7 @@ window.addEventListener('load', () => {
                         });
                     break;
                 case 'loginForm':
-                    postData('/login', $(form).serialize())
+                    postData('/login', formToQueryString(form))
                         .then(data => {
                             if(data.success) {
                                 $('#validationServer05').removeClass('is-invalid');
