@@ -2,7 +2,7 @@
 
 namespace ToDo\core;
 
-class paginationHelper
+class PaginationHelper
 {
     private static $itemsPerPage = 3;
     private static $currentPage = 1;
@@ -29,7 +29,6 @@ class paginationHelper
 
     static function LimitString() : string
     {
-        list($from, $count) = self::LimitRange();
-        return "$from, $count";
+        return implode(", ", self::LimitRange());
     }
 }

@@ -17,18 +17,18 @@ class View
 
     public function __get($name)
     {
-        return $this->_shared_storage->Get($name);
+        return $this->_shared_storage->get($name);
     }
     public function __set($name, $value)
     {
-        $this->_shared_storage->Set($name, $value);
+        $this->_shared_storage->set($name, $value);
     }
     public function __isset($name)
     {
         return $this->_shared_storage->has($name);
     }
 
-    public function SetTitle(string $title)
+    public function setTitle(string $title)
     {
         $this->_title = $title;
     }
@@ -36,8 +36,8 @@ class View
     /**
      *  Build page including markup file(s)
      *
-     * @param string $layout // main html file(_wrapper_layout)
-     * @param string $view   // will be inserted in _wrapper_layout
+     * @param string $layout - main html file(_wrapper_layout)
+     * @param string $view - will be inserted in _wrapper_layout
      *
      * @throws \ErrorException
      */

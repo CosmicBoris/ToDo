@@ -5,7 +5,7 @@ namespace ToDo\Controllers;
 use ToDo\core\Controller;
 use ToDo\core\Request;
 use ToDo\core\Router;
-use ToDo\core\paginationHelper;
+use ToDo\core\PaginationHelper;
 use ToDo\core\Validator;
 use ToDo\Models\TasksModel;
 
@@ -17,22 +17,22 @@ class TasksController extends Controller
     public function __construct()
     {
         parent::__construct();
-        paginationHelper::setItemsPerPage(self::ITEMS_PER_PAGE);
+        PaginationHelper::setItemsPerPage(self::ITEMS_PER_PAGE);
         $this->_model = new TasksModel();
     }
 
     public function actionIndex()
     {
-        $this->_view->SetTitle('Welcome');
-        paginationHelper::setCurrentPage(Router::getUriSegment(1));
+        $this->_view->setTitle('Welcome');
+        PaginationHelper::setCurrentPage(Router::getUriSegment(1));
 
-        if(Request::isAjax()){
+        if(Request::isAjax()) {
             $tasksCount = $this->_model->getTasksCount();
             $this->pages = ceil($tasksCount / self::ITEMS_PER_PAGE);
             $this->items = [];
-            if($tasksCount > 0){
+            if($tasksCount > 0) {
                 try {
-                    $this->items = $this->_model->getTasks(['sort' => $_GET['sort'], 'limit' => paginationHelper::LimitString()]);
+                    $this->items = $this->_model->getTasks(['sort' => $_GET['sort'], 'limit' => PaginationHelper::LimitString()]);
                 } catch (\ErrorException $e) {
                     $this->success = false;
                     $this->error = $e->getMessage();
@@ -58,7 +58,7 @@ class TasksController extends Controller
                 } catch (\ErrorException $e) {
                 }
             }
-            echo \json_encode(['operation' => 'add' ,'success' => $result]);
+            echo \json_encode(['operation' => 'add', 'success' => $result]);
         }
     }
 

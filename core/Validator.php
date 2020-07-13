@@ -11,6 +11,28 @@ final class Validator
 
     private function __construct(){ }
 
+    /**
+     * @param $data
+     * @param $ignored
+     * @return array|string
+     */
+    private function getSafeString($data, $ignored)
+    {
+        if(is_array($data)) {
+            foreach($data as $key => $value) {
+                if(is_array($ignored)) { // we have keys to ignore
+                    if(!in_array($key, $ignored)) { // if key that we don`t ignore
+                        $data[$key] = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+                    }
+                } else { // we don`t have keys to ignore
+                    $data[$key] = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+                }
+            }
+            return $data;
+        }
+        return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
+    }
+
     public static function getInstance()
     {
         if(is_null(self::$_instance)) {
@@ -21,7 +43,7 @@ final class Validator
 
     public function Prepare($data, $required_fields = false, $ignored = false)
     {
-        $this->_data = $this->GetSafeString($data, $ignored);
+        $this->_data = $this->getSafeString($data, $ignored);
         $this->_required_fields = $required_fields;
         return $this;
     }
@@ -64,30 +86,12 @@ final class Validator
         return filter_var($this->getField($key), FILTER_VALIDATE_EMAIL);
     }
 
-    // remove html code
-    private function GetSafeString($data, $ignored)
-    {
-        if(is_array($data)){
-            foreach($data as $key => $value){
-                if(is_array($ignored)) { // we have keys to ignore
-                    if(!in_array($key, $ignored)) { // if key that we don`t ignore
-                        $data[$key] = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
-                    }
-                } else { // we don`t have keys to ignore
-                    $data[$key] = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
-                }
-            }
-            return $data;
-        }
-        return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
-    }
-
     public function hasErrors() : bool
     {
         return !empty($this->_errors);
     }
 
-    public function getErrors()
+    public function getErrors(): array
     {
         return $this->_errors;
     }

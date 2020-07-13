@@ -6,15 +6,18 @@ final class Storage implements \JsonSerializable
 {
     private $data = [];
 
-    public function Set($name, $value){
+    public function set($name, $value)
+    {
         $this->data[$name] = $value;
     }
 
-    public function Get($name){
+    public function get($name)
+    {
         return $this->data[$name] ?? null;
     }
 
-    public function has($key) {
+    public function has($key)
+    {
         return isset($this->data[$key]);
     }
 

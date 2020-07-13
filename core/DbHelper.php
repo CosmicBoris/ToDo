@@ -14,7 +14,7 @@ final class DbHelper
         $this->_db = new \mysqli(Config::DB_HOST, Config::DB_USER, Config::DB_PASS, Config::DB_NAME);
 
         if($this->_db->connect_errno){
-            trigger_error('MySQL connection error: (' . $this->_db->connect_errno . ') ' . $this->_db->connect_error, E_USER_ERROR);
+            trigger_error("MySQL connection error: ( $this->_db->connect_errno ) $this->_db->connect_error", E_USER_ERROR);
         }
 
         $this->_db->set_charset("utf-8");
@@ -33,7 +33,7 @@ final class DbHelper
         return self::$_instance;
     }
 
-    function getCount(string $table, string $column, string $where = null)
+    public function getCount(string $table, string $column, string $where = null)
     {
         $this->_sql = "SELECT COUNT($column) AS c FROM $table";
         if($where)
@@ -47,9 +47,14 @@ final class DbHelper
         return -1;
     }
 
-    function getMySqli()
+    public function getMySqli()
     {
         return $this->_db;
+    }
+
+    public function lastInsertedId()
+    {
+        return $this->_db->insert_id;
     }
 
     private function RunQuery()
@@ -65,10 +70,5 @@ final class DbHelper
     {
         $this->_errors = $this->_db->error_list;
         $this->_errors['query'] = $this->_sql;
-    }
-
-    function lastInsertedId()
-    {
-        return $this->_db->insert_id;
     }
 }

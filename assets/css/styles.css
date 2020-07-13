@@ -5,6 +5,7 @@
 
 body {
     background-color: #9fb6bb21;
+    background: linear-gradient(120deg, rgba(187, 185, 154, 0.13) 0%, #9fb6bb21 100%);
 }
 
 @keyframes cardAnim {
@@ -47,11 +48,22 @@ body {
     justify-content: center;
     align-items: center;
 }
-#cardsWrapper.spinner-grow{
+
+#cardsWrapper.spinner-grow {
     width: 3rem;
     height: 3rem;
 }
 
 .page-item:not(.active) {
     cursor: pointer;
+}
+
+::selection {
+    background: rgba(127, 255, 212, 0.71);
+    color: black;
+}
+
+.custom-text::selection {
+    background: deeppink;
+    color: white;
 }

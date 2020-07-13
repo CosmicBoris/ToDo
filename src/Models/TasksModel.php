@@ -21,13 +21,11 @@ final class TasksModel extends Model
 
     function getTasks($pars): array
     {
-        $sortOptions = ['sa' => 'completed ASC', 'sd' => 'completed DESC', 'ua' => 'username ASC', 'ud' => 'username DESC', 'ea' => 'email ASC', 'ed' => 'email DESC',
-        ];
+        $sortOptions = ['sa' => 'completed ASC', 'sd' => 'completed DESC', 'ua' => 'username ASC', 'ud' => 'username DESC', 'ea' => 'email ASC', 'ed' => 'email DESC',];
 
-        if(isset($pars['sort']) && array_key_exists($pars['sort'], $sortOptions)){
+        if(isset($pars['sort']) && array_key_exists($pars['sort'], $sortOptions)) {
             $order = $sortOptions[$pars['sort']];
-        }
-        else
+        } else
             $order = 'completed DESC';
 
         $db = $this->dbLink->getMySqli();
@@ -51,35 +49,35 @@ final class TasksModel extends Model
         return $tasks;
     }
 
-    function getTasksCount() : int
+    function getTasksCount(): int
     {
         return $this->dbLink->getCount('tasks', 'id');
     }
 
-    function updateTask($arr): int
+    function updateTask($task): int
     {
-        $id = $arr['id'];
-        unset($arr['id']);
-        if(isset($arr['content']))
-            $arr['edited'] = '1';
+        $id = $task['id'];
+        unset($task['id']);
+        if(isset($task['content']))
+            $task['edited'] = '1';
 
         $db = $this->dbLink->getMySqli();
 
         $i = 0;
         $set = '';
-        foreach($arr as $key => $value) {
+        foreach($task as $key => $value) {
             if(++$i > 1)
                 $set .= ', ';
             $set .= "$key=?";
         }
 
         $sql = "UPDATE tasks SET $set WHERE id=$id";
-        if (!($stmt = $db->prepare($sql))){
+        if(!($stmt = $db->prepare($sql))) {
             throw new \ErrorException("Не удалось подготовить запрос: (" . $db->errno . ") " . $db->error);
         }
-        $types = str_repeat('s', count($arr));
-        $stmt->bind_param($types, ...array_values($arr));
-        if (!$stmt->execute()){
+        $types = str_repeat('s', count($task));
+        $stmt->bind_param($types, ...array_values($task));
+        if(!$stmt->execute()) {
             throw new \ErrorException("Не удалось выполнить запрос: (" . $stmt->errno . ") " . $stmt->error);
         }
 

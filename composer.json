@@ -1,16 +1,24 @@
 {
-    "name": "boris/to-do",
-    "description": "test app",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Boris Shobat",
-            "email": "cosmicboris@gmail.com"
-        }
-    ],
-    "autoload": {
-        "psr-4": {"ToDo\\core\\": "core/", "ToDo\\": "src/"}
-    },
+  "name": "boris/to-do",
+  "description": "test app",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Boris Shobat",
+      "email": "cosmicboris@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "ToDo\\core\\": "core/",
+      "ToDo\\": "src/"
+    }
+  },
+  "config": {
+    "platform": {
+      "php": "7.4.0"
+    }
+  },
   "require": {
     "ext-json": "*"
   }

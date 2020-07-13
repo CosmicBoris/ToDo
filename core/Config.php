@@ -7,8 +7,8 @@ class Config
     const DEFAULT_CONTROLLER = "Tasks";
     const DEFAULT_ACTION     = "Index";
 
-    const LAYOUT_DIR         = "layouts/";
-    const STYLES_DIR         = "/assets/css/";
+    const LAYOUT_DIR = "src/views/";
+    const STYLES_DIR = "/assets/css/";
     const MAIN_LAYOUT        = "index";
     const LAYOUT_TYPE        = ".phtml";
 

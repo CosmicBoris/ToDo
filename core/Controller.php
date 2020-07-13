@@ -11,13 +11,13 @@ abstract class Controller
     public function __construct()
     {
         $this->_shared_storage = new Storage();
-        $this->_view           = new View($this->_shared_storage);
+        $this->_view = new View($this->_shared_storage);
     }
 
     /** default action of every Controller **/
     abstract public function actionIndex();
 
-    // if user require non-existent action
+    // if user required non-existent action
     public function Show404()
     {
         http_response_code(404);
@@ -26,11 +26,11 @@ abstract class Controller
 
     public function __set($name, $value)
     {
-        $this->_shared_storage->Set($name, $value);
+        $this->_shared_storage->set($name, $value);
     }
     public function __get($name)
     {
-        return $this->_shared_storage->Get($name);
+        return $this->_shared_storage->get($name);
     }
     public function __isset($name)
     {
