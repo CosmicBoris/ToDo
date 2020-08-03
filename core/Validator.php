@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace ToDo\core;
 
@@ -7,7 +7,7 @@ final class Validator
     protected static $_instance = null;
     private $_data;
     private $_required_fields;
-    private $_errors = array();
+    private $_errors = [];
 
     private function __construct(){ }
 
@@ -41,14 +41,14 @@ final class Validator
         return self::$_instance;
     }
 
-    public function Prepare($data, $required_fields = false, $ignored = false)
+    public function prepare($data, $required_fields = false, $ignored = false)
     {
         $this->_data = $this->getSafeString($data, $ignored);
         $this->_required_fields = $required_fields;
         return $this;
     }
 
-    public function CheckForEmpty()
+    public function checkForEmpty()
     {
         if(!empty($this->_required_fields) && is_array($this->_required_fields)) {
             foreach($this->_required_fields as $key) {
@@ -73,7 +73,7 @@ final class Validator
         return null;
     }
 
-    public function getRequiredFields() : array
+    public function getRequiredFields(): array
     {
         $fields = [];
         foreach($this->_required_fields as $field)
@@ -81,12 +81,12 @@ final class Validator
         return $fields;
     }
 
-    public function CheckEmail(string $key)
+    public function checkEmail(string $key)
     {
         return filter_var($this->getField($key), FILTER_VALIDATE_EMAIL);
     }
 
-    public function hasErrors() : bool
+    public function hasErrors(): bool
     {
         return !empty($this->_errors);
     }

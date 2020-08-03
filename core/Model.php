@@ -1,13 +1,13 @@
 <?php
 namespace ToDo\core;
 
-class Model
+abstract class Model
 {
-    // link to database and DbHelper methods
+    // link to database and helper methods
     protected $dbLink;
 
     public function __construct()
     {
-        $this->dbLink = DbHelper::getInstance();
+        $this->dbLink = DBlink::getInstance();
     }
 }

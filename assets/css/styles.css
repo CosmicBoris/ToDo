@@ -25,7 +25,7 @@ body {
     border-top: 1px solid white;
 }
 
-.cardReveal {
+.card_revealing {
     animation-name: cardAnim;
     animation-duration: .4s;
     animation-timing-function: cubic-bezier(.18, .89, .32, 1.28);

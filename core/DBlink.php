@@ -1,8 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace ToDo\core;
 
-final class DbHelper
+use Config;
+
+final class DBlink
 {
     protected static $_instance = null;
     private $_db;
@@ -16,8 +19,6 @@ final class DbHelper
         if($this->_db->connect_errno){
             trigger_error("MySQL connection error: ( $this->_db->connect_errno ) $this->_db->connect_error", E_USER_ERROR);
         }
-
-        $this->_db->set_charset("utf-8");
     }
 
     public function __destruct()
@@ -25,7 +26,7 @@ final class DbHelper
         $this->_db->close();
     }
 
-    public static function getInstance(): DbHelper
+    public static function getInstance(): DBlink
     {
         if(is_null(self::$_instance)) {
             self::$_instance = new self;
@@ -39,7 +40,7 @@ final class DbHelper
         if($where)
             $this->_sql .= " WHERE $where";
 
-        if($result = $this->RunQuery()) {
+        if($result = $this->runQuery()) {
             $obj = $result->fetch_assoc();
             $result->close();
             return intval($obj['c']);
@@ -52,18 +53,54 @@ final class DbHelper
         return $this->_db;
     }
 
-    public function lastInsertedId()
-    {
-        return $this->_db->insert_id;
-    }
-
-    private function RunQuery()
+    private function runQuery()
     {
         if(FALSE === $result = $this->_db->query($this->_sql))
             self::setErrors();
 
         $this->_sql = "";
         return $result;
+    }
+
+    /**
+     * @param string $query
+     * @return array from first row
+     */
+    public function extractQueryResult(string $query): ?array
+    {
+        $this->_sql = $query;
+
+        if($r = $this->runQuery()) {
+            $output = $r->fetch_assoc();
+            $r->close();
+            return $output;
+        }
+        return null;
+    }
+
+    /**
+     * @param string $query
+     * @param callable|null $callback [optional] <p>
+     * called for each fetched row
+     * </p>
+     * @return array of rows
+     */
+    public function extractQueryResults(string $query, callable $callback = null): array
+    {
+        $output = [];
+        $this->_sql = $query;
+
+        if($r = $this->runQuery()) {
+            while($obj = $r->fetch_assoc())
+                $output[] = $callback == null ? $obj : $callback($obj);
+            $r->close();
+        }
+        return $output;
+    }
+
+    public function lastInsertedId()
+    {
+        return $this->_db->insert_id;
     }
 
     private function setErrors()

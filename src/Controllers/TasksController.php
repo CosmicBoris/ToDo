@@ -1,11 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace ToDo\Controllers;
 
 use ToDo\core\Controller;
 use ToDo\core\Request;
 use ToDo\core\Router;
-use ToDo\core\PaginationHelper;
+use ToDo\core\Pagination;
 use ToDo\core\Validator;
 use ToDo\Models\TasksModel;
 
@@ -17,14 +17,14 @@ class TasksController extends Controller
     public function __construct()
     {
         parent::__construct();
-        PaginationHelper::setItemsPerPage(self::ITEMS_PER_PAGE);
+        Pagination::setItemsPerPage(self::ITEMS_PER_PAGE);
         $this->_model = new TasksModel();
     }
 
     public function actionIndex()
     {
         $this->_view->setTitle('Welcome');
-        PaginationHelper::setCurrentPage(Router::getUriSegment(1));
+        Pagination::setCurrentPage(Router::getUriSegment(1));
 
         if(Request::isAjax()) {
             $tasksCount = $this->_model->getTasksCount();
@@ -32,7 +32,7 @@ class TasksController extends Controller
             $this->items = [];
             if($tasksCount > 0) {
                 try {
-                    $this->items = $this->_model->getTasks(['sort' => $_GET['sort'], 'limit' => PaginationHelper::LimitString()]);
+                    $this->items = $this->_model->getTasks(['sort' => $_GET['sort'], 'limit' => Pagination::limitString()]);
                 } catch (\ErrorException $e) {
                     $this->success = false;
                     $this->error = $e->getMessage();
@@ -41,7 +41,7 @@ class TasksController extends Controller
             header("Content-type: application/json");
             echo \json_encode($this->_shared_storage);
         } else
-            $this->_view->Render();
+            $this->_view->render();
     }
 
     public function actionAdd()
@@ -50,8 +50,8 @@ class TasksController extends Controller
             header("Content-type: application/json");
             $keys = ['username', 'email', 'content'];
             $result = false;
-            $v = Validator::getInstance()->Prepare($_POST, $keys)->CheckForEmpty();
-            if(!$v->hasErrors() && $v->CheckEmail('email')) {
+            $v = Validator::getInstance()->prepare($_POST, $keys)->checkForEmpty();
+            if(!$v->hasErrors() && $v->checkEmail('email')) {
                 try {
                     $this->_model->addTask($v->getRequiredFields());
                     $result = true;
@@ -68,18 +68,22 @@ class TasksController extends Controller
             header("Content-type: application/json");
             if(isset($_SESSION['role']) && $_SESSION['role'] == 'admin'){
                 try{
-                    if($this->_model->updateTask($_POST)){
+                    if($this->_model->updateTask($_POST)) {
                         echo \json_encode(['success' => true, 'text' => 'Task updated']);
-                    }
-                    else
+                    } else
                         echo \json_encode(['success' => false, 'text' => 'Error updating task']);
-                }
-                catch (\ErrorException $exception) {
+                } catch (\ErrorException $exception) {
                     echo \json_encode(['success' => false, 'text' => $exception->getMessage()]);
                 }
+            } else {
+                header('HTTP/1.0 401 Unauthorized');
+                echo '{"success": false, "text": "Admin permission required"}';
             }
-            else
-                echo \json_encode(['success' => false, 'text' => 'Admin permission required']);
         }
+    }
+
+    public function __invoke()
+    {
+        $this->actionIndex();
     }
 }

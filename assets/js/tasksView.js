@@ -52,13 +52,13 @@ class TasksView {
         item.style.opacity = '0';
         item.style.animationDelay = i * 100 + 'ms';
         item.addEventListener('animationend', this.taskRevealed, false);
-        item.classList.add('cardReveal');
+        item.classList.add('card_revealing');
     }
 
     taskRevealed(e){
         e.target.removeEventListener('animationend', this.taskRevealed);
         e.target.removeAttribute('style');
-        e.target.classList.remove('cardReveal');
+        e.target.classList.remove('card_revealing');
     }
 
     displayTasks(tasks){

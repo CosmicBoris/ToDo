@@ -1,54 +1,58 @@
-<?php
-namespace ToDo\core;
+<?php declare(strict_types=1);
 
+namespace ToDo\core;
 
 class Router
 {
     const CTR = 'Controller';
-    private static $segments = array();
-    private static $controllerName;
-    private static $actionName;
+    /** @var array $segments */
+    private static $segments;
     private static $namespace;
     private static $defController;
+    private static $controllerName;
+    private static $actionName = 'Index';
 
-    public function __construct($namespace, $defController = 'Home')
+    public function __construct(string $namespace, string $defController = 'Home')
     {
         self::$namespace = $namespace;
         self::$defController = $defController;
         // Uri without get parameters
-        self::Redirect(@strtok($_GET['url'], '?'));
+        self::redirect(strtok($_SERVER['REQUEST_URI'], '?'));
     }
 
-    public static function Redirect(string $path)
+    // PSR-1 camelCase method names
+    public static function redirect(string $path)
     {
-        self::$segments = explode('/', $path);
-        self::Start();
+        self::$segments = explode('/', trim($path, '/'));
+        self::start();
     }
 
-    public static function Start(): void
+    public static function start(): void
     {
-        /** @var Controller $controller */
-
         // controllers name Uppercase
         self::$controllerName = ucfirst(self::$segments[0] ?: self::$defController);
 
-        $controllerName = self::$namespace . '\\' . self::$controllerName . self::CTR;
+        $className = self::$namespace . '\\' . self::$controllerName . self::CTR;
 
-        if(!class_exists($controllerName)) {
-            $controllerName = self::$namespace . '\\' . self::$defController . self::CTR;
-            $controller = new $controllerName();
-            $controller->Show404();
-            return;
-        }
+        if(!class_exists($className))
+            throw new \InvalidArgumentException("No matching controller class found");
 
-        $controller = new $controllerName();
+        /** @var Controller $controller */
+        $controller = new $className();
 
-        self::$actionName = ucfirst(self::$segments[1]) ?: '';
-        $action = self::getActionName(true);
-        if(method_exists($controller, $action)) {
-            $controller->{$action}();
-        } else {
-            self::$actionName = 'Index';
+        // check if controller single action (__invoke defined)
+        if(is_callable($controller)) {
+            $controller();
+        } // if action present in url
+        else if(isset(self::$segments[1])) {
+            self::$actionName = ucfirst(self::$segments[1]);
+            $action = self::getActionName(true);
+            if(!method_exists($controller, $action)) {
+                throw new \InvalidArgumentException("The controller action \"$action\" undefined.");
+            }
+            $controller->$action();
+        } // no action passed use default
+        else {
             $controller->actionIndex();
         }
     }
@@ -59,7 +63,7 @@ class Router
      */
     public static function getControllerName(bool $fullname = false): string
     {
-        return $fullname ? self::$controllerName . "Controller" : self::$controllerName;
+        return $fullname ? self::$controllerName . 'Controller' : self::$controllerName;
     }
 
     /**
@@ -77,6 +81,6 @@ class Router
      */
     public static function getUriSegment(int $pos): ?string
     {
-        return self::$segments[$pos] ?? null;
+        return self::$segments[$pos] ?: null;
     }
 }

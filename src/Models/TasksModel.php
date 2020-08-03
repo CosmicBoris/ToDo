@@ -1,22 +1,26 @@
 <?php
+declare(strict_types=1);
+
 namespace ToDo\Models;
 
 use ToDo\core\Model;
 
 final class TasksModel extends Model
 {
-    function addTask($data): void
+    function addTask($data): int
     {
         $db = $this->dbLink->getMySqli();
 
         if(!($stmt = $db->prepare("INSERT INTO tasks (username, email, content) VALUES (?,?,?)"))) {
             throw new \ErrorException("Не удалось подготовить запрос: (" . $db->errno . ") " . $db->error);
         }
-        $stmt->bind_param("sss", $data['username'], $data['email'], $data['content']);
+        [$username, $email, $content] = $data;
+        $stmt->bind_param("sss", $username, $email, $content);
         if(!$stmt->execute()) {
             throw new \ErrorException("Не удалось выполнить запрос: (" . $stmt->errno . ") " . $stmt->error);
         }
         $stmt->close();
+        return $db->insert_id;
     }
 
     function getTasks($pars): array
@@ -32,11 +36,11 @@ final class TasksModel extends Model
 
         $query = "SELECT id, username, email, content, completed, edited FROM tasks ORDER BY $order LIMIT {$pars['limit']}";
 
-        if (!($stmt = $db->prepare($query))){
-            throw new \ErrorException("Не удалось подготовить запрос: (" . $db->errno . ") " . $db->error);
+        if(!$stmt = $db->prepare($query)) {
+            throw new \ErrorException("Unable to prepare query: (" . $db->errno . ") " . $db->error);
         }
-        if (!$stmt->execute()){
-            throw new \ErrorException("Не удалось выполнить запрос: (" . $stmt->errno . ") " . $stmt->error);
+        if(!$stmt->execute()) {
+            throw new \ErrorException("Unable to execute query: (" . $stmt->errno . ") " . $stmt->error);
         }
         $r = $stmt->get_result();
 

@@ -18,10 +18,10 @@ abstract class Controller
     abstract public function actionIndex();
 
     // if user required non-existent action
-    public function Show404()
+    public function show404()
     {
         http_response_code(404);
-        include_once Config::LAYOUT_DIR . '404.html';
+        include_once \Config::LAYOUT_DIR . '404.html';
     }
 
     public function __set($name, $value)

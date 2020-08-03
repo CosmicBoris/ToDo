@@ -19,7 +19,6 @@ class ButtonInOut {
             if(localStorage.isAdmin) {
                 getData('/logout').then(R => {
                     if(R.success) {
-                        deleteAllCookies();
                         localStorage.removeItem('isAdmin');
                         this.update();
                         if(typeof this.cb === "function")
@@ -119,70 +118,6 @@ const Sort = callback => {
     };
 };
 
-async function postData(url = '', data){
-    const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        redirect: 'follow',
-        referrerPolicy: 'no-referrer',
-        body: data
-    });
-    return await response.json();
-}
-
-async function getData(url = ''){
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: {"X-Requested-With": "XMLHttpRequest"}
-    });
-    return await response.json();
-}
-
-const createElement = (name, attributes, ...children) => {
-    let node = document.createElement(name);
-    for(const attr in attributes)
-        if(attributes.hasOwnProperty(attr))
-            node.setAttribute(attr, attributes[attr]);
-    children.forEach(child => {
-        if(typeof child !== 'string') node.appendChild(child);
-        else node.appendChild(document.createTextNode(child));
-    });
-    return node;
-};
-
-const fireToast = (massage) => {
-    let t = $('#apptoast');
-    t.find(".toast-body").text(massage);
-    t.toast('show');
-};
-
-const deleteAllCookies = () => {
-    document.cookie.split(";").forEach(cookie => {
-        let eqPos = cookie.indexOf("=");
-        let name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
-        document.cookie = name + "=;expires=Thu, 01 Jan 2000 00:00:00 GMT";
-    });
-};
-
-const formToQueryString = form => {
-    let props = [];
-    new FormData(form).forEach((value, key) => {
-        props.push(encodeURIComponent(key) + "=" + encodeURIComponent(value));
-    });
-    return props.join('&');
-};
-
 const tasksManager = new TasksManager();
-const btnLogin = new ButtonInOut(() => tasksManager.requestData());
-
-(function ready(){
-    return new Promise(resolve => {
-        function isReady(){
-            if(document.readyState !== 'loading') resolve();
-        }
-
-        document.addEventListener('readystatechange', isReady);
-        isReady();
-    });
-}()).then(tasksManager.start.bind(tasksManager));
+const btnLogin = new ButtonInOut(_ => tasksManager.requestData());
+tasksManager.start();

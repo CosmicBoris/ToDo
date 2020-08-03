@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace ToDo\core;
 
-class PaginationHelper
+class Pagination
 {
     private static $itemsPerPage = 3;
     private static $currentPage = 1;
@@ -17,18 +17,18 @@ class PaginationHelper
         self::$currentPage = (is_numeric($index) && $index > 0) ? $index : 1;
     }
 
-    static function getCurrentPage() : int
+    static function getCurrentPage(): int
     {
         return self::$currentPage;
     }
 
-    static function LimitRange() : array
+    static function limitRange(): array
     {
         return [(self::$currentPage * self::$itemsPerPage) - self::$itemsPerPage, self::$itemsPerPage];
     }
 
-    static function LimitString() : string
+    static function limitString(): string
     {
-        return implode(", ", self::LimitRange());
+        return implode(", ", self::limitRange());
     }
 }
