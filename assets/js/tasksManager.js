@@ -1,3 +1,8 @@
+import Sort from "./sort.js";
+import Pagination from "./pagination.js";
+import TasksProvider from "./tasksProvider.js";
+import TasksView from "./tasksView.js";
+
 /**
  *  Old fashion functional approach
  **/
@@ -29,3 +34,5 @@ proto.initEvents = function(){
 proto.start = function(){
     this._model.requestData(this._pagination.currentPage, this._sort.order);
 };
+
+export default TasksManager;

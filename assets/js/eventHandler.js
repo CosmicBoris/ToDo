@@ -4,7 +4,7 @@
  * My implementation of Observer(Observable)
  * P.S. name reference to C#
  */
-class EventHandler {
+export default class EventHandler {
     constructor(){
         this._listeners = [];
     }

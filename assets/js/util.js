@@ -43,3 +43,5 @@ const formToQueryString = form => {
     });
     return props.join('&');
 };
+
+export {getData, postData, fireToast, createElement, formToQueryString};

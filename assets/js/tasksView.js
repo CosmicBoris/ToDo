@@ -1,10 +1,12 @@
+import {createElement} from "./util.js";
+
 /**
  * @class TasksView
  */
-class TasksView {
+export default class TasksView {
     constructor(){
         this.DOM = Object.create(null);
-        this.DOM.cardWrapper = document.getElementById('cardsWrapper');
+        this.DOM.cardWrapper = document.getElementById('cw');
 
         // Fetch all the forms we want to apply custom Bootstrap validation styles to
         let forms = document.getElementsByClassName('needs-validation');
@@ -50,9 +52,20 @@ class TasksView {
 
     revealTask(item, i){
         item.style.opacity = '0';
-        item.style.animationDelay = i * 100 + 'ms';
+        item.style.animationDelay = i * 150 + 'ms';
         item.addEventListener('animationend', this.taskRevealed, false);
         item.classList.add('card_revealing');
+
+        /*let a = AnimationUtil();
+        a.addUpdateListener(() => {
+            const v = `rotateX(${a.getAnimatedRawValue()}deg)`;
+            item.style["-webkit-transform"] = v;
+            item.style["transform"] = v;
+        })
+        a.setDuration(1500);
+        a.setInterpolator(a.EasingFunctions.springRelaxed);
+        a.setValues(-90, 0);
+        setTimeout(() =>{a.start()}, i * 150);*/
     }
 
     taskRevealed(e){

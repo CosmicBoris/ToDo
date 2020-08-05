@@ -1,3 +1,7 @@
+import EventHandler from "./eventHandler.js";
+import {getData} from "./util.js";
+
+
 /* Factory function */
 const TasksProvider = () => {
     let _dataChanged = new EventHandler();
@@ -5,7 +9,7 @@ const TasksProvider = () => {
     const context = Object.create(null);
 
     context.addTask = (task) => {
-        postData('/tasks/add', formToQueryString(form))
+        /*postData('/tasks/add', formToQueryString(form))
             .then(R => {
                 if(R.success) {
                     tasksManager.requestData();
@@ -14,7 +18,7 @@ const TasksProvider = () => {
                     form.classList.remove('was-validated');
                     form.reset();
                 }
-            });
+            });*/
     };
 
     context.editTask = (id, updatedText) => {
@@ -43,3 +47,5 @@ const TasksProvider = () => {
 
     return context;
 };
+
+export default TasksProvider;
