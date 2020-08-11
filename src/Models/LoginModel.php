@@ -10,7 +10,7 @@ class LoginModel extends Model
     public function login(string $login, string $password): bool
     {
         $db = $this->dbLink->getMySqli();
-        if(!$stmt = $db->prepare('SELECT login, password FROM admins WHERE login=? LIMIT 1')) {
+        if(!$stmt = $db->prepare('SELECT id, username, password, email, role FROM users WHERE username=? LIMIT 1')) {
             throw new \ErrorException("Unable to prepare query: ( $db->errno ) $db->error ");
         }
         $stmt->bind_param('s', $login);
@@ -21,8 +21,7 @@ class LoginModel extends Model
         $stmt->close();
 
         if(password_verify($password, $user['password'])) {
-            $_SESSION['login'] = $login;
-            $_SESSION['role'] = 'admin';
+            $_SESSION['user'] = $user;
             return true;
         }
         return false;

@@ -25,7 +25,7 @@ final class TasksModel extends Model
 
     function getTasks($pars): array
     {
-        $sortOptions = ['sa' => 'completed ASC', 'sd' => 'completed DESC', 'ua' => 'username ASC', 'ud' => 'username DESC', 'ea' => 'email ASC', 'ed' => 'email DESC',];
+        $sortOptions = ['sa' => 'completed ASC', 'sd' => 'completed DESC', 'ua' => 'username ASC', 'ud' => 'username DESC', 'ea' => 'email ASC', 'ed' => 'email DESC'];
 
         if(isset($pars['sort']) && array_key_exists($pars['sort'], $sortOptions)) {
             $order = $sortOptions[$pars['sort']];

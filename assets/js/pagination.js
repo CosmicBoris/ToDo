@@ -2,18 +2,19 @@ import {createElement} from "./util.js";
 
 const Pagination = (container, callback) => {
     const update = _ => {
-        while(ul.firstChild)
-            ul.removeChild(ul.firstChild);
+        while(_ul.firstChild)
+            _ul.removeChild(_ul.firstChild);
 
-        if(_pagesCount < 2) return;
+        if(_pagesCount < 2)
+            return;
 
         for(let i = 1; i <= _pagesCount; i++)
-            ul.insertAdjacentHTML('beforeend',
+            _ul.insertAdjacentHTML('beforeend',
                 `<li class="page-item${i === _currentPage ? ' active' : ''}"><a class="page-link">${i}</a></li>`);
     };
     const onClick = e => {
         e.preventDefault();
-        let page = parseInt(e.target.innerText);
+        let page = +e.target.innerText;
         if(_currentPage !== page) {
             _currentPage = page;
             update();
@@ -24,19 +25,19 @@ const Pagination = (container, callback) => {
 
     let _pagesCount = 0,
         _currentPage = 1,
-        ul = createElement("ul", {class: "pagination justify-content-center"});
+        _ul = createElement("ul", {class: "pagination justify-content-center"});
+    container.appendChild(_ul);
 
-    ul.addEventListener('click', onClick, false);
-    container.appendChild(ul);
+    _ul.addEventListener('click', onClick, false);
 
     return {
-        show: _ => ul.style.visibility = "visible",
-        hide: _ => ul.style.visibility = "hidden",
-        set setPages(value){
+        show: _ => _ul.style.visibility = "visible",
+        hide: _ => _ul.style.visibility = "hidden",
+        set setPage(value){
             _pagesCount = value;
             update();
         },
-        get currentPage(){ return _currentPage }
+        get current(){ return _currentPage }
     };
 };
 

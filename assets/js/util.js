@@ -22,7 +22,7 @@ const fireToast = massage => {
     let t = $('#apptoast');
     t.find(".toast-body").text(massage);
     t.toast('show');
-};
+}
 
 const createElement = (name, attributes, ...children) => {
     let node = document.createElement(name);
@@ -34,7 +34,21 @@ const createElement = (name, attributes, ...children) => {
         else node.appendChild(document.createTextNode(child));
     });
     return node;
-};
+}
+
+const applyStyles = (css) => {
+    const head = document.head || document.getElementsByTagName('head')[0],
+        style = document.createElement('style');
+    style.type = 'text/css';
+
+    if(style.styleSheet) {
+        // This is required for IE8 and below.
+        style.styleSheet.cssText = css;
+    } else {
+        style.appendChild(document.createTextNode(css));
+    }
+    head.appendChild(style);
+}
 
 const formToQueryString = form => {
     let props = [];
@@ -42,6 +56,6 @@ const formToQueryString = form => {
         props.push(encodeURIComponent(key) + "=" + encodeURIComponent(value));
     });
     return props.join('&');
-};
+}
 
-export {getData, postData, fireToast, createElement, formToQueryString};
+export {getData, postData, fireToast, createElement, applyStyles, formToQueryString}

@@ -32,7 +32,7 @@ class ButtonInOut {
     }
 
     update(){
-        this.btn.innerText = localStorage.isAdmin ? 'Sign Out' : 'Login';
+        this.btn.innerText = localStorage.isAdmin ? 'Sign Out' : 'Sign In';
     }
 }
 

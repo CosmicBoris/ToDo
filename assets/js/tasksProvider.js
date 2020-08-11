@@ -1,6 +1,5 @@
 import EventHandler from "./eventHandler.js";
-import {getData} from "./util.js";
-
+import {getData, postData} from "./util.js";
 
 /* Factory function */
 const TasksProvider = () => {
@@ -18,18 +17,18 @@ const TasksProvider = () => {
                     form.classList.remove('was-validated');
                     form.reset();
                 }
-            });*/
+         });*/
     };
 
     context.editTask = (id, updatedText) => {
 
     };
 
-    context.deleteTask = (id) => {
+    context.toggleTask = id => {
 
     };
 
-    context.toggleTask = (id) => {
+    context.deleteTask = id => {
 
     };
 

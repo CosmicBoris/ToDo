@@ -77,7 +77,8 @@ export default class TasksView {
     displayTasks(tasks){
         let wrapper = this.DOM.cardWrapper;
 
-        while(wrapper.firstChild) wrapper.removeChild(wrapper.firstChild);
+        while(wrapper.firstChild)
+            wrapper.removeChild(wrapper.firstChild);
 
         tasks.forEach((task, i) => {
             let card = this.createCard(task),
