@@ -1,6 +1,6 @@
 :root {
     --card-background-color: rgb(251, 251, 251);
-    --card-shadow-color: rgba(0, 32, 128, 0.1);
+    --card-shadow-color: rgba(36, 71, 101, 0.1);
 }
 
 body {
@@ -48,19 +48,6 @@ body {
     height: 3rem;
 }
 
-.card {
-    background-color: var(--card-background-color);
-    box-shadow: 0 1px 2px var(--card-shadow-color);
-    border-top: 1px solid white;
-    transform-origin: 50% 0 0;
-}
-
-.card_revealing {
-    animation-name: cardAnim;
-    animation-duration: .4s;
-    animation-timing-function: cubic-bezier(.18, .89, .32, 1.28);
-}
-
 #apptoast {
     position: absolute;
     top: 5rem;
@@ -70,4 +57,54 @@ body {
 
 .page-item:not(.active) {
     cursor: pointer;
+}
+
+
+.task-card {
+    display: flex;
+    background-color: var(--card-background-color);
+    border-top: 1px solid white;
+    border-radius: 6px;
+    box-shadow: 0 1px 1px var(--card-shadow-color),
+    0 1px 2px var(--card-shadow-color),
+    0 2px 4px var(--card-shadow-color),
+    0 4px 8px var(--card-shadow-color);
+    transform-origin: 50% 0 0;
+}
+
+.task-card_revealing {
+    animation-name: cardAnim;
+    animation-duration: .4s;
+    animation-timing-function: cubic-bezier(.18, .89, .32, 1.28);
+}
+
+.task-card__left {
+    position: relative;
+    min-height: 1px;
+    padding: 1.25rem;
+}
+
+.task-card__input[type="checkbox"] {
+    opacity: 0;
+    -webkit-appearance: none;
+    display: inline-block;
+    vertical-align: middle;
+    z-index: 100;
+}
+
+.task-card__input[type="checkbox"],
+.task-card__input[type="checkbox"] + label {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    top: 50%;
+    left: 0;
+    margin-top: -15px;
+    margin-left: 15px;
+    cursor: pointer;
+}
+
+.task-card__input[type="checkbox"] + label {
+    border: 2px solid #576371;
+    border-radius: 50%;
 }

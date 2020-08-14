@@ -27,14 +27,33 @@ proto.init = function(){
 };
 
 proto.initEvents = function(){
-    this.onTasksListChanged = (sender, data) => {
-        data.items.length > 1 || data.pages > 1 ? this._sort.show() : this._sort.hide();
-        this._pagination.setPage = data.pages;
-        this._view.displayTasks(data.items);
+    this.onLogin = (sender, query) => {
+        postData('/login', query)
+            .then(R => {
+                if(R.success) {
+                    $('#validationServer05').removeClass('is-invalid');
+                    localStorage.isAdmin = true;
+                    btnLogin.update();
+                    fireToast("ADMIN IN DA HOUSE!");
+                    tasksManager.requestData();
+                    $('#loginModal').modal('hide');
+                    form.classList.remove('was-validated');
+                    form.reset();
+                } else {
+                    $('#validationServer05').addClass('is-invalid');
+                }
+            });
     };
 
-    this.onAddTask = todoText => {
-        this._model.addTask(todoText);
+
+    this.onAddTask = (sender, task) => {
+        this._model.addTask(task);
+    };
+
+    this.onTaskAdded = (sender, obj) => {
+        this.start();
+        this._view.fireToast("Success, task added 🥳");
+        this._view.taskAdded();
     };
 
     this.onEditTask = (id, todoText) => {
@@ -49,6 +68,17 @@ proto.initEvents = function(){
         this._model.deleteTask(id);
     };
 
+    this.onTasksListChanged = (sender, data) => {
+        data.items.length > 1 || data.pages > 1 ? this._sort.show() : this._sort.hide();
+        this._pagination.setPage = data.pages;
+        this._view.displayTasks(data.items);
+    };
+
+
+    this._view.onLoginSubmit = this.onLogin;
+    this._view.onTaskSubmit = this.onAddTask;
+
+    this._model.onTaskAdded = this.onTaskAdded;
     this._model.onDataSetChanged = this.onTasksListChanged;
 };
 

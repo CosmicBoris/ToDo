@@ -24,6 +24,6 @@ export default class EventHandler {
 
     notify(sender, args){
         for(let i = 0; i < this._listeners.length; i++)
-            this._listeners[i](sender, args);
+            this._listeners[i](sender || this, args);
     }
 }

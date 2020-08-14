@@ -1,4 +1,5 @@
-import {createElement} from "./util.js";
+import {createElement, formToObject, formToQueryString} from "./util.js";
+import EventHandler from "./eventHandler.js";
 
 /**
  * @class TasksView
@@ -7,54 +8,60 @@ export default class TasksView {
     constructor(){
         this.DOM = Object.create(null);
         this.DOM.cardWrapper = document.getElementById('cw');
+        this.DOM.forms = document.forms;
 
-        // Fetch all the forms we want to apply custom Bootstrap validation styles to
-        let forms = document.getElementsByClassName('needs-validation');
-        Array.prototype.filter.call(forms, function(form){
-            form.addEventListener('submit', e => {
-                e.preventDefault();
-                e.stopPropagation();
-
-                if(!form.checkValidity()) {
-                    form.classList.add('was-validated');
-                    return;
-                }
-
-                switch(form.id){
-                    case 'new_task':
-
-                        break;
-                    case 'loginForm':
-                        postData('/login', formToQueryString(form))
-                            .then(data => {
-                                if(data.success) {
-                                    $('#validationServer05').removeClass('is-invalid');
-                                    localStorage.isAdmin = true;
-                                    btnLogin.update();
-                                    fireToast("ADMIN IN DA HOUSE!");
-                                    tasksManager.requestData();
-                                    $('#loginModal').modal('hide');
-                                    form.classList.remove('was-validated');
-                                    form.reset();
-                                } else {
-                                    $('#validationServer05').addClass('is-invalid');
-                                }
-                            });
-                        break;
-                }
-            }, false);
-        });
+        this.initEvents();
     }
 
     initEvents(){
+        this._loginHandler = new EventHandler();
 
+        this._addTaskHandler = new EventHandler();
+        this._editTaskHandler = new EventHandler();
+        this._completeTaskHandler = new EventHandler();
+        this._deleteTaskHandler = new EventHandler();
+
+        this._onFormSubmit = e => {
+            e.preventDefault();
+            const form = e.target;
+
+            if(form.classList.contains("needs-validation") && !form.checkValidity()) {
+                form.classList.add('was-validated');
+                return;
+            }
+
+            switch(form.name){
+                case 'new_task':
+                    this._addTaskHandler.notify(null, formToObject(form));
+                    break;
+                case 'login':
+                    this._loginHandler.notify(null, formToQueryString(form));
+                    break;
+            }
+        }
+
+        for(let form of this.DOM.forms){
+            form.addEventListener('submit', this._onFormSubmit, false);
+        }
+    }
+
+    taskAdded(){
+        $('#collapseOne').collapse('hide');
+        this.DOM.forms.new_task.classList.remove('was-validated');
+        this.DOM.forms.new_task.reset();
+    }
+
+    taskRevealed(e){
+        e.target.removeEventListener('animationend', this.taskRevealed);
+        e.target.removeAttribute('style');
+        e.target.classList.remove('task-card_revealing');
     }
 
     revealTask(item, i){
         item.style.opacity = '0';
         item.style.animationDelay = i * 150 + 'ms';
         item.addEventListener('animationend', this.taskRevealed, false);
-        item.classList.add('card_revealing');
+        item.classList.add('task-card_revealing');
 
         /*let a = AnimationUtil();
         a.addUpdateListener(() => {
@@ -66,12 +73,6 @@ export default class TasksView {
         a.setInterpolator(a.EasingFunctions.springRelaxed);
         a.setValues(-90, 0);
         setTimeout(() =>{a.start()}, i * 150);*/
-    }
-
-    taskRevealed(e){
-        e.target.removeEventListener('animationend', this.taskRevealed);
-        e.target.removeAttribute('style');
-        e.target.classList.remove('card_revealing');
     }
 
     displayTasks(tasks){
@@ -144,33 +145,37 @@ export default class TasksView {
         });
     }
 
-    createCard({id, username, email, content, completed}){
-        return createElement('div', {class: 'card mb-2', 'data-id': id},
+    createCard({id, title, content, date_created}){
+        return createElement('div', {class: 'task-card mb-2', 'data-id': id},
+            createElement('div', {class: 'task-card__left'},
+                createElement('input', {class: "task-card__input", name: "state", type: "checkbox"}),
+                createElement('label', {for: "state"})),
             createElement('div', {class: 'card-body'},
-                createElement('h5', {class: 'card-title'}, `${username} <${email}>`),
+                createElement('h5', {class: 'card-title'}, `<${title}>`),
                 createElement('p', {class: 'card-text'}, content),
-                createElement('span', {class: 'badge badge-pill badge-secondary'}, completed ? 'Done' : 'Uncompleted')));
+                createElement('span', {class: 'badge badge-secondary'}, new Date(date_created).toLocaleString("en-GB", {
+                    year: 'numeric', month: 'short', day: 'numeric',
+                    hour: 'numeric', minute: 'numeric', second: 'numeric',
+                    hour12: false
+                }))));
     }
 
-    bindAddTodo(handler){
-        this.form.addEventListener('submit', event => {
-            event.preventDefault()
-
-            if(this._todoText) {
-                handler(this._todoText)
-                this._resetInput()
-            }
-        })
+    fireToast(message){
+        let t = $('#apptoast');
+        t.find(".toast-body").text(message);
+        t.toast('show');
     }
 
-    bindDeleteTodo(handler){
-        this.todoList.addEventListener('click', event => {
-            if(event.target.className === 'delete') {
-                const id = parseInt(event.target.parentElement.id)
+    set onLoginSubmit(cb){
+        this._loginHandler.on(cb);
+    }
 
-                handler(id)
-            }
-        })
+    set onTaskSubmit(cb){
+        this._addTaskHandler.on(cb);
+    }
+
+    set onTaskEdited(cb){
+        this._editTaskHandler.on(cb);
     }
 
     bindEditTodo(handler){
@@ -184,9 +189,27 @@ export default class TasksView {
         })
     }
 
+    set onToggleTask(cb){
+        this._completeTaskHandler.on(cb);
+    }
+
     bindToggleTodo(handler){
         this.todoList.addEventListener('change', event => {
             if(event.target.type === 'checkbox') {
+                const id = parseInt(event.target.parentElement.id)
+
+                handler(id)
+            }
+        })
+    }
+
+    set onDeleteTask(cb){
+        this._deleteTaskHandler.on(cb);
+    }
+
+    bindDeleteTodo(handler){
+        this.todoList.addEventListener('click', event => {
+            if(event.target.className === 'delete') {
                 const id = parseInt(event.target.parentElement.id)
 
                 handler(id)

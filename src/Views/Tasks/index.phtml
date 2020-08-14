@@ -9,28 +9,19 @@
                 </div>
                 <div id="collapseOne" class="collapse" aria-labelledby="headingOne">
                     <div class="card-body">
-                        <form id="new_task" class="needs-validation" novalidate>
-                            <div class="form-row">
-                                <div class="col-md-6 mb-2">
-                                    <label for="validationCustom01">User name</label>
-                                    <input type="text" class="form-control" name="username" id="validationCustom01"
-                                           required>
-                                    <div class="invalid-feedback">Please enter username.</div>
-                                </div>
-                                <div class="col-md-6 mb-2">
-                                    <label for="validationCustom02">Email</label>
-                                    <input type="email" class="form-control" name="email" id="validationCustom02"
-                                           required>
-                                    <div class="invalid-feedback">Please provide a valid email.</div>
-                                </div>
+                        <form name="new_task" class="needs-validation" novalidate>
+                            <div class="form-group mb-2">
+                                <label for="formTaskTitle">Title</label>
+                                <input type="text" class="form-control" name="title" id="formTaskTitle">
+                                <div class="invalid-feedback">Please enter username.</div>
                             </div>
                             <div class="form-group">
-                                <label for="exampleFormControlTextarea1">Description</label>
-                                <textarea class="form-control" name="content" id="exampleFormControlTextarea1" rows="2"
+                                <label for="formTaskContent">Description</label>
+                                <textarea class="form-control" name="content" id="formTaskContent" rows="2"
                                           required></textarea>
                                 <div class="invalid-feedback">Can't add empty task.</div>
                             </div>
-                            <button class="btn btn-primary text-right" type="submit">Submit</button>
+                            <button class="btn btn-primary text-right" type="submit">ADD</button>
                         </form>
                     </div>
                 </div>
@@ -77,7 +68,7 @@
                         Wrong login or password...
                     </div>
                 </div>
-                <form id="loginForm" class="needs-validation" novalidate>
+                <form name="login" class="needs-validation" novalidate>
                     <div class="mb-3">
                         <input type="text" placeholder="Login" name="login" class="form-control" id="modal_login"
                                required>
