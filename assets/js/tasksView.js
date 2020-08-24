@@ -1,5 +1,6 @@
-import {createElement, formToObject, formToQueryString} from "./util.js";
+import {createElement, createSVGElement, formToObject, formToQueryString} from "./util.js";
 import EventHandler from "./eventHandler.js";
+import TaskCard from "./task.card.js";
 
 /**
  * @class TasksView
@@ -7,7 +8,7 @@ import EventHandler from "./eventHandler.js";
 export default class TasksView {
     constructor(){
         this.DOM = Object.create(null);
-        this.DOM.cardWrapper = document.getElementById('cw');
+        this.DOM.cardWrapper = document.getElementById('cWrapper');
         this.DOM.forms = document.forms;
 
         this.initEvents();
@@ -18,8 +19,31 @@ export default class TasksView {
 
         this._addTaskHandler = new EventHandler();
         this._editTaskHandler = new EventHandler();
-        this._completeTaskHandler = new EventHandler();
+        this._toggleTaskHandler = new EventHandler();
         this._deleteTaskHandler = new EventHandler();
+
+        this._onTaskEdit = e => {
+            if(this._temporaryTodoText) {
+                const id = parseInt(event.target.parentElement.id)
+
+                handler(id, this._temporaryTodoText)
+                this._temporaryTodoText = ''
+            }
+        }
+
+        this._onTaskToggle = e => {
+            if(e.target.type === 'checkbox') {
+                const id = e.target.closest('[data-id]').getAttribute('data-id');
+                this._toggleTaskHandler.notify(null, id);
+            }
+        }
+
+        this._onTaskDelete = e => {
+            if(e.target.className === 'delete') {
+                const id = e.target.parentElement.id;
+                this._deleteTaskHandler.notify(null, id);
+            }
+        }
 
         this._onFormSubmit = e => {
             e.preventDefault();
@@ -43,6 +67,10 @@ export default class TasksView {
         for(let form of this.DOM.forms){
             form.addEventListener('submit', this._onFormSubmit, false);
         }
+
+        this.DOM.cardWrapper.addEventListener('focusout', this._onTaskEdit);
+        this.DOM.cardWrapper.addEventListener('click', this._onTaskDelete);
+        this.DOM.cardWrapper.addEventListener('change', this._onTaskToggle);
     }
 
     taskAdded(){
@@ -57,11 +85,11 @@ export default class TasksView {
         e.target.classList.remove('task-card_revealing');
     }
 
-    revealTask(item, i){
-        item.style.opacity = '0';
-        item.style.animationDelay = i * 150 + 'ms';
-        item.addEventListener('animationend', this.taskRevealed, false);
-        item.classList.add('task-card_revealing');
+    revealTask(card, i){
+        card.style.opacity = '0';
+        card.style.animationDelay = i * 150 + 'ms';
+        card.addEventListener('animationend', this.taskRevealed, false);
+        card.classList.add('task-card_revealing');
 
         /*let a = AnimationUtil();
         a.addUpdateListener(() => {
@@ -82,12 +110,9 @@ export default class TasksView {
             wrapper.removeChild(wrapper.firstChild);
 
         tasks.forEach((task, i) => {
-            let card = this.createCard(task),
-                cardBody = card.firstChild;
-
-            if(task.edited)
-                cardBody.insertAdjacentHTML('afterbegin',
-                    '<span class="badge badge-warning float-right">Edited by admin</span>');
+            const card = new TaskCard(task).element;
+            this.revealTask(card, i);
+            wrapper.appendChild(card);
 
             /*if(localStorage.isAdmin) {
                 let text = createElement('textarea', {
@@ -140,24 +165,7 @@ export default class TasksView {
                 });
 
             }*/
-            this.revealTask(card, i);
-            wrapper.appendChild(card);
         });
-    }
-
-    createCard({id, title, content, date_created}){
-        return createElement('div', {class: 'task-card mb-2', 'data-id': id},
-            createElement('div', {class: 'task-card__left'},
-                createElement('input', {class: "task-card__input", name: "state", type: "checkbox"}),
-                createElement('label', {for: "state"})),
-            createElement('div', {class: 'card-body'},
-                createElement('h5', {class: 'card-title'}, `<${title}>`),
-                createElement('p', {class: 'card-text'}, content),
-                createElement('span', {class: 'badge badge-secondary'}, new Date(date_created).toLocaleString("en-GB", {
-                    year: 'numeric', month: 'short', day: 'numeric',
-                    hour: 'numeric', minute: 'numeric', second: 'numeric',
-                    hour12: false
-                }))));
     }
 
     fireToast(message){
@@ -174,46 +182,15 @@ export default class TasksView {
         this._addTaskHandler.on(cb);
     }
 
-    set onTaskEdited(cb){
+    set onTaskEdit(cb){
         this._editTaskHandler.on(cb);
     }
 
-    bindEditTodo(handler){
-        this.todoList.addEventListener('focusout', event => {
-            if(this._temporaryTodoText) {
-                const id = parseInt(event.target.parentElement.id)
-
-                handler(id, this._temporaryTodoText)
-                this._temporaryTodoText = ''
-            }
-        })
+    set onTaskToggle(cb){
+        this._toggleTaskHandler.on(cb);
     }
 
-    set onToggleTask(cb){
-        this._completeTaskHandler.on(cb);
-    }
-
-    bindToggleTodo(handler){
-        this.todoList.addEventListener('change', event => {
-            if(event.target.type === 'checkbox') {
-                const id = parseInt(event.target.parentElement.id)
-
-                handler(id)
-            }
-        })
-    }
-
-    set onDeleteTask(cb){
+    set onTaskDelete(cb){
         this._deleteTaskHandler.on(cb);
-    }
-
-    bindDeleteTodo(handler){
-        this.todoList.addEventListener('click', event => {
-            if(event.target.className === 'delete') {
-                const id = parseInt(event.target.parentElement.id)
-
-                handler(id)
-            }
-        })
     }
 }

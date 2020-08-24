@@ -16,8 +16,8 @@ proto.init = function(){
     this._model = TasksProvider();
     this._view = new TasksView();
     this._sort = DropdownSort({
-        container: "#sortWrapper",
-        items: {'s': 'Status', 'u': 'User name', 'e': 'Email'},
+        container: "#sWrapper",
+        items: {'d': 'Date', 's': 'Status'},
         callback: this.start.bind(this),
     });
     this._sort.hide();
@@ -47,6 +47,7 @@ proto.initEvents = function(){
 
 
     this.onAddTask = (sender, task) => {
+        this._sort.destroy();
         this._model.addTask(task);
     };
 
@@ -56,17 +57,33 @@ proto.initEvents = function(){
         this._view.taskAdded();
     };
 
+
+    this.onToggleTask = (sender, id) => {
+        this._model.toggleTask(id);
+    };
+
+    this.onTaskToggled = (sender, id) => {
+
+    };
+
+
     this.onEditTask = (id, todoText) => {
         this._model.editTask(id, todoText);
     };
 
-    this.onToggleTask = id => {
-        this._model.toggleTask(id);
+    this.onTaskEdited = (sender, id) => {
+
     };
+
 
     this.onDeleteTask = id => {
         this._model.deleteTask(id);
     };
+
+    this.onTaskDeleted = id => {
+        this._model.deleteTask(id);
+    };
+
 
     this.onTasksListChanged = (sender, data) => {
         data.items.length > 1 || data.pages > 1 ? this._sort.show() : this._sort.hide();
@@ -77,8 +94,12 @@ proto.initEvents = function(){
 
     this._view.onLoginSubmit = this.onLogin;
     this._view.onTaskSubmit = this.onAddTask;
+    this._view.onTaskEdit = this.onEditTask;
+    this._view.onTaskToggle = this.onToggleTask;
+    this._view.onTaskDelete = this.onDeleteTask;
 
     this._model.onTaskAdded = this.onTaskAdded;
+
     this._model.onDataSetChanged = this.onTasksListChanged;
 };
 

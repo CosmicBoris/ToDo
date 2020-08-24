@@ -12,6 +12,10 @@ body {
     color: black;
 }
 
+input[type="button"] {
+    outline: none !important;
+}
+
 .custom-text::selection {
     background: deeppink;
     color: white;
@@ -32,7 +36,7 @@ body {
     perspective: 1000px;
 }
 
-.cardsWrapper:first-child {
+.cards-wrapper:first-child {
     position: fixed;
     top: 0;
     left: 0;
@@ -43,7 +47,7 @@ body {
     align-items: center;
 }
 
-.cardsWrapper.spinner-grow {
+.cards-wrapper.spinner-grow {
     width: 3rem;
     height: 3rem;
 }
@@ -59,8 +63,16 @@ body {
     cursor: pointer;
 }
 
+.icon {
+    display: inline-block;
+    width: 1.25em;
+    height: 1.25em;
+    fill: currentColor;
+}
 
+/* region task card */
 .task-card {
+    --color_stroke: #576371;
     display: flex;
     background-color: var(--card-background-color);
     border-top: 1px solid white;
@@ -84,7 +96,7 @@ body {
     padding: 1.25rem;
 }
 
-.task-card__input[type="checkbox"] {
+.task-card__cbox {
     opacity: 0;
     -webkit-appearance: none;
     display: inline-block;
@@ -92,8 +104,8 @@ body {
     z-index: 100;
 }
 
-.task-card__input[type="checkbox"],
-.task-card__input[type="checkbox"] + label {
+.task-card__cbox,
+.task-card__cbox[type="checkbox"] + label {
     position: absolute;
     width: 30px;
     height: 30px;
@@ -104,7 +116,50 @@ body {
     cursor: pointer;
 }
 
-.task-card__input[type="checkbox"] + label {
-    border: 2px solid #576371;
+.task-card__cbox[type="checkbox"] + label {
+    border: 2px solid var(--color_stroke);
     border-radius: 50%;
 }
+
+.task-card svg {
+    pointer-events: none;
+}
+
+.task-card__toggle {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    top: 50%;
+    margin-top: -12px;
+    margin-left: -2px;
+}
+
+.task-card__toggle use {
+    stroke: var(--color_stroke);
+    stroke-width: 14px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+    transition: stroke-dashoffset .8s cubic-bezier(.38, .08, .65, .93);
+}
+
+.task-card__options {
+    position: relative;
+    width: 2em;
+    height: 2em;
+    background: none;
+    border: none;
+    color: #798796;
+    outline: none !important;
+    padding: 0;
+    margin-top: 0.625rem;
+    -webkit-transition: -webkit-transform 0.5s, color .3s;
+    -moz-transition: -moz-transform 0.5s, color .3s;
+    transition: transform 0.5s, color .3s;
+}
+
+.task-card__options:hover {
+    color: var(--color_stroke);
+}
+
+/* endregion task card */

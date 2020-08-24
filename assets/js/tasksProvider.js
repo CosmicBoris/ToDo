@@ -3,11 +3,11 @@ import {getData, postData} from "./util.js";
 
 /* Factory function */
 const TasksProvider = () => {
-    let _dataChanged = new EventHandler();
     let _taskAdded = new EventHandler();
     let _taskEdited = new EventHandler();
     let _taskToggled = new EventHandler();
     let _taskDeleted = new EventHandler();
+    let _dataChanged = new EventHandler();
 
     const context = Object.create(null);
 
@@ -22,7 +22,7 @@ const TasksProvider = () => {
             });*/
 
         task.id = tasks.length + 1;
-        task.date_created = new Date().getTime();
+        task.date = new Date().getTime(); // Also Date.now()
         tasks.push(task);
         localStorage.tasks = JSON.stringify(tasks);
 
@@ -35,6 +35,8 @@ const TasksProvider = () => {
 
     context.toggleTask = id => {
 
+
+        _taskToggled.notify(null, id);
     };
 
     context.deleteTask = id => {
@@ -53,6 +55,27 @@ const TasksProvider = () => {
         enumerable: false,
         set: function(cb){
             _taskAdded.on(cb);
+        }
+    });
+
+    Object.defineProperty(context, 'onTaskEdited', {
+        enumerable: false,
+        set: function(cb){
+            _taskEdited.on(cb);
+        }
+    });
+
+    Object.defineProperty(context, 'onTaskToggled', {
+        enumerable: false,
+        set: function(cb){
+            _taskToggled.on(cb);
+        }
+    });
+
+    Object.defineProperty(context, 'onTaskDeleted', {
+        enumerable: false,
+        set: function(cb){
+            _taskDeleted.on(cb);
         }
     });
 

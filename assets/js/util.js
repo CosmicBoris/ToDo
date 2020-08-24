@@ -30,6 +30,22 @@ const createElement = (name, attributes, ...children) => {
     return node;
 }
 
+const createSVGElement = (attributes, symbolId) => {
+    let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+
+    for(const attr in attributes)
+        if(attributes.hasOwnProperty(attr))
+            svg.setAttributeNS(null, attr, attributes[attr]);
+
+    if(symbolId) {
+        let useEl = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+        useEl.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', `#${symbolId}`);
+        svg.appendChild(useEl);
+    }
+
+    return svg;
+}
+
 const applyStyles = (css) => {
     const head = document.head || document.getElementsByTagName('head')[0],
         style = document.createElement('style');
@@ -57,7 +73,7 @@ const formToQueryString = form => {
     return props.join('&');
 }
 
-export {getData, postData, createElement, applyStyles, formToObject, formToQueryString}
+export {getData, postData, createElement, createSVGElement, applyStyles, formToObject, formToQueryString}
 
 
 /*public class DateTimeUtil

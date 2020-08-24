@@ -19,13 +19,11 @@ const css = `
     vertical-align: middle;
     height: 100%;
 }
-
 .sort-ctr__btn-trigger,
 .sort-ctr__btn-direction {
     position: relative;
     vertical-align: middle;
 }
-
 .sort-ctr__btn-trigger {
     display: inline-block;
     background-color: transparent;
@@ -48,24 +46,20 @@ const css = `
     border: 0;
     padding: 0;
 }
-
 .sort-ctr__btn-trigger:focus {
     outline: none;
     outline-offset: -4px;
 }
-
 .sort-ctr__btn-trigger span::after {
     content: attr(data-c);
     margin-left: .5rem;
     text-decoration: underline;
 }
-
 .sort-ctr__btn-direction {
     display: inline-block;
     height: 21px;
     width: 21px;
 }
-
 .sort-ctr__btn-direction span{
     top: 50%;
     left: 50%;
@@ -74,7 +68,6 @@ const css = `
     -o-transform: translateX(-50%) translateY(-50%);
     transform: translateX(-50%) translateY(-50%);
 }
-
 .sort-ctr__btn-direction span,
 .sort-ctr__btn-direction span:before,
 .sort-ctr__btn-direction span:after {
@@ -90,7 +83,6 @@ const css = `
     -o-transition: .25s ease-in-out;
     transition: .25s ease-in-out;
 }
-
 .sort-ctr__btn-direction span:before,
 .sort-ctr__btn-direction span:after {
     content: '';
@@ -103,21 +95,18 @@ const css = `
 .sort-ctr__btn-direction span:after{
     transform: translateY(.35em);
 }
-
 .sort-ctr__btn-direction[data-d="a"] span:before {
     width: .5em;
 }
 .sort-ctr__btn-direction[data-d="a"] span:after {
     width: 1em;
 }
-
 .sort-ctr__btn-direction[data-d="d"] span:before {
     width: 1em;
 }
 .sort-ctr__btn-direction[data-d="d"] span:after {
     width: .5em;
 }
-
 .sort-ctr__list {
     --height: 0;
     position: absolute;
@@ -138,14 +127,12 @@ const css = `
     pointer-events: auto;
     overflow: hidden;
 }
-
 .sort-ctr_expanded .sort-ctr__list {
     transition-delay: 0s;
     visibility: visible;
     opacity: 1;
     max-height: var(--height);
 }
-
 .sort-ctr__li{
     color: black;
     -webkit-transition: opacity .3s;
@@ -153,7 +140,6 @@ const css = `
     -o-transition: opacity .3s;
     transition: opacity .3s;
 }
-
 .sort-ctr__list:hover li:not(:hover){
     opacity: .7;
 }`;
@@ -171,12 +157,15 @@ const template = `
 
 const directions = {ASC: 'a', DESC: 'd'};
 
-const DropdownSort = (params) => {
+const DropdownSort = params => {
     const DOM = Object.create(null),
         getDir = _ => localStorage.sortDir || directions.DESC,
-        setDir = v => { localStorage.sortDir = v; },
+        setDir = v => {
+            DOM.btnDirection.setAttribute('data-d', v);
+            localStorage.sortDir = v;
+        },
         getOrder = _ => localStorage.sort || '',
-        setOrder = v => { localStorage.sort = v; },
+        setOrder = v => localStorage.sort = v,
         setCurrent = item => {
             DOM.valueHolder.setAttribute('data-c', item.textContent);
             setOrder(item.dataset.v);
@@ -198,26 +187,25 @@ const DropdownSort = (params) => {
             }
             DOM.itemsHolder.appendChild(fragment);
 
-            if(!match) setCurrent(DOM.itemsHolder.firstChild);
+            if(!match)
+                setCurrent(DOM.itemsHolder.firstChild);
         };
 
     function onClick(e){
         if(e.target === DOM.btnDirection) {
-            let newVal = getDir() === directions.DESC ? directions.ASC : directions.DESC;
-            DOM.btnDirection.setAttribute('data-d', newVal);
-            setDir(newVal);
+            setDir(getDir() === directions.DESC ? directions.ASC : directions.DESC);
+            params.callback && params.callback();
+        } else if(e.target.tagName === 'LI' && e.target.dataset.v !== getOrder()) {
+            console.log("item click");
+            setCurrent(e.target);
             params.callback && params.callback();
         } else {
             this.classList.toggle('sort-ctr_expanded');
         }
-
     }
 
-    function onItemClick(e){
-        if(e.target.tagName === 'LI' && e.target.dataset.v !== getOrder()) {
-            setCurrent(e.target);
-            params.callback && params.callback();
-        }
+    function onOutOfFocus(e){
+        this.classList.remove('sort-ctr_expanded');
     }
 
     function init(){
@@ -241,36 +229,40 @@ const DropdownSort = (params) => {
     }
 
     function initEvents(){
-        DOM.element.onclick = (e) => {
-            DOM.element.onclick = null;
-
+        DOM.element.onclick = e => {
             let styles = window.getComputedStyle(DOM.itemsHolder, null),
-                pad = parseInt(styles.getPropertyValue('padding-top')) + parseInt(styles.getPropertyValue('padding-bottom'));
-            if(!isNaN(pad))
-                DOM.itemsHolder.style.setProperty('--height', DOM.itemsHolder.scrollHeight + pad + 'px');
+                padding = parseInt(styles.getPropertyValue('padding-top'))
+                    + parseInt(styles.getPropertyValue('padding-bottom'));
+            if(!isNaN(padding))
+                DOM.itemsHolder.style.setProperty('--height', DOM.itemsHolder.scrollHeight + padding + 'px');
 
-            DOM.element.addEventListener('click', onClick, false);
+            DOM.element.onclick = onClick;
             onClick.call(DOM.element, e);
         };
 
-        DOM.itemsHolder.addEventListener('click', onItemClick, false);
+        DOM.element.addEventListener('focusout', onOutOfFocus);
     }
 
     init();
 
     return {
         setItems,
+        get element(){
+            return DOM.element;
+        },
         get value(){
             return localStorage.sort ? localStorage.sort + getDir() : '';
         },
-        show: _ => { DOM.element.style.visibility = "visible"; },
-        hide: _ => { DOM.element.style.visibility = "hidden"; },
+        show: _ => DOM.element.style.visibility = "visible",
+        hide: _ => DOM.element.style.visibility = "hidden",
         destroy: () => {
             DOM.element.removeEventListener('click', onClick);
+            DOM.element.removeEventListener('focusout', onOutOfFocus);
             DOM.itemsHolder.removeEventListener('click', onItemClick);
+            if(DOM.element.parentElement)
+                DOM.element.parentElement.removeChild(DOM.element);
             for(let f in DOM) delete DOM[f];
-        },
-        element: DOM.element
+        }
     };
 };
 
