@@ -30,17 +30,26 @@ const TasksProvider = () => {
     };
 
     context.editTask = (id, updatedText) => {
-
+        postData('/tasks/update/', `id=${id}&content=${updatedText}`)
+            .then(R => {
+                if(R.success) {
+                    _taskEdited.notify();
+                } else {
+                    fireToast(R.text);
+                    btnLogin.update();
+                    $('#loginModal').modal('show');
+                }
+            });
     };
 
-    context.toggleTask = id => {
-
-
-        _taskToggled.notify(null, id);
+    context.toggleTask = (id, state) => {
+        postData('/tasks/update/', `id=${id}&completed=${Number(state)}`)
+            .then(R => _taskToggled.notify(null, R));
     };
 
     context.deleteTask = id => {
-
+        postData('/tasks/delete/', `id=${id}`)
+            .then(R => _taskDeleted.notify(null, R));
     };
 
     context.requestData = (page, order) => {

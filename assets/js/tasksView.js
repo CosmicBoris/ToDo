@@ -113,58 +113,6 @@ export default class TasksView {
             const card = new TaskCard(task).element;
             this.revealTask(card, i);
             wrapper.appendChild(card);
-
-            /*if(localStorage.isAdmin) {
-                let text = createElement('textarea', {
-                    class: 'form-control',
-                    name: 'content',
-                    rows: '1'
-                }, task.content);
-                cardBody.appendChild(text);
-
-                let btn = createElement('button', {class: "btn btn-primary btn-sm float-right mt-1"}, 'Update');
-                btn.addEventListener('click', function(){
-                    btn.insertAdjacentHTML('afterbegin', '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
-                    postData('/tasks/update/', `id=${task.id}&content=${text.value}`)
-                        .then(R => {
-                            btn.removeChild(btn.firstChild);
-                            if(R.success) {
-                                fireToast(R.text);
-                                state.requestData();
-                            } else {
-                                fireToast(R.text);
-                                btnLogin.update();
-                                $('#loginModal').modal('show');
-                            }
-                        });
-                });
-                cardBody.appendChild(btn);
-                cardBody.appendChild(
-                    createElement('div', {class: "custom-control custom-checkbox float-left"},
-                        createElement('input', {
-                            type: "checkbox",
-                            id: 'cb' + task.id,
-                            class: "custom-control-input"
-                        }),
-                        createElement('label', {class: "custom-control-label", for: 'cb' + task.id}, 'Done'))
-                );
-                if(task.completed)
-                    cardBody.querySelector('input').checked = true;
-
-                cardBody.lastElementChild.firstElementChild.addEventListener('click', function(e){
-                    postData('/tasks/update/', `id=${task.id}&completed=${Number(this.checked)}`)
-                        .then(R => {
-                            if(R.success) {
-                                fireToast(R.text);
-                            }
-                            else {
-                                fireToast(R.text);
-                                this.checked = !this.checked;
-                            }
-                        });
-                });
-
-            }*/
         });
     }
 

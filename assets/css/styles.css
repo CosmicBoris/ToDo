@@ -152,7 +152,7 @@ input[type="button"] {
     color: #798796;
     outline: none !important;
     padding: 0;
-    margin-top: 0.625rem;
+    margin: 0.625rem 0.25rem 0 0;
     -webkit-transition: -webkit-transform 0.5s, color .3s;
     -moz-transition: -moz-transform 0.5s, color .3s;
     transition: transform 0.5s, color .3s;
@@ -161,5 +161,4 @@ input[type="button"] {
 .task-card__options:hover {
     color: var(--color_stroke);
 }
-
 /* endregion task card */
