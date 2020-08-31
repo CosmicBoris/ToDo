@@ -8,10 +8,9 @@ const TasksProvider = () => {
     let _taskToggled = new EventHandler();
     let _taskDeleted = new EventHandler();
     let _dataChanged = new EventHandler();
-
+    let localTasks;
     const context = Object.create(null);
 
-    let tasks;
 
     context.addTask = (task) => {
         /*postData('/tasks/add', formToQueryString(form))
@@ -21,10 +20,10 @@ const TasksProvider = () => {
                 }
             });*/
 
-        task.id = tasks.length + 1;
+        task.id = localTasks.length + 1;
         task.date = new Date().getTime(); // Also Date.now()
-        tasks.push(task);
-        localStorage.tasks = JSON.stringify(tasks);
+        localTasks.push(task);
+        localStorage.tasks = JSON.stringify(localTasks);
 
         _taskAdded.notify();
     };
@@ -48,16 +47,20 @@ const TasksProvider = () => {
     };
 
     context.deleteTask = id => {
-        postData('/tasks/delete/', `id=${id}`)
-            .then(R => _taskDeleted.notify(null, R));
+        /*postData('/tasks/delete/', `id=${id}`)
+            .then(R => _taskDeleted.notify(null, R));*/
+
+        localTasks = localTasks.filter(task => task.id !== id);
+        localStorage.tasks = JSON.stringify(localTasks);
+        _dataChanged.notify(null, {items: localTasks, pages: 1});
     };
 
     context.requestData = (page, order) => {
         /*getData(`/tasks/${page}?sort=${order}`)
             .then(data => _dataChanged.notify(null, data));*/
 
-        tasks = localStorage.getItem('tasks') ? JSON.parse(localStorage.getItem('tasks')) : [];
-        _dataChanged.notify(null, {items: tasks, pages: 1});
+        localTasks = localStorage.getItem('tasks') ? JSON.parse(localStorage.getItem('tasks')) : [];
+        _dataChanged.notify(null, {items: localTasks, pages: 1});
     };
 
     Object.defineProperty(context, 'onTaskAdded', {

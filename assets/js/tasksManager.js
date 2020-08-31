@@ -1,6 +1,6 @@
 import TasksView from "./tasksView.js";
 import TasksProvider from "./tasksProvider.js";
-import DropdownSort from "./dropdown.js";
+import DropdownSort from "./dropdown.sort.js";
 import Pagination from "./pagination.js";
 
 /**
@@ -76,12 +76,12 @@ proto.initEvents = function(){
     };
 
 
-    this.onDeleteTask = id => {
+    this.onDeleteTask = (sender, id) => {
         this._model.deleteTask(id);
     };
 
-    this.onTaskDeleted = id => {
-        this._model.deleteTask(id);
+    this.onTaskDeleted = (sender, id) => {
+
     };
 
 

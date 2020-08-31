@@ -39,8 +39,8 @@ export default class TasksView {
         }
 
         this._onTaskDelete = e => {
-            if(e.target.className === 'delete') {
-                const id = e.target.parentElement.id;
+            if(e.target.dataset.hint === 'delete') {
+                const id = parseInt(e.target.closest("[data-id]").dataset.id);
                 this._deleteTaskHandler.notify(null, id);
             }
         }

@@ -1,4 +1,5 @@
 import {createElement, createSVGElement} from "./util.js";
+import Dropdown from "./dropdown.js";
 
 let pathLength = null;
 
@@ -12,7 +13,7 @@ export default class TaskCard {
                     createSVGElement({class: "task-card__toggle"})),
                 createElement('div', {class: 'card-body'},
                     createElement('h4', {class: 'card-title'}, title),
-                    createElement('p', {class: 'card-text'}, content),
+                    createElement('p', {class: 'card-text', contenteditable: 'true'}, content),
                     createElement('span', {class: 'badge badge-secondary'},
                         new Date(date).toLocaleString("en-GB", {
                                 year: 'numeric', month: 'short', day: 'numeric',
@@ -20,9 +21,15 @@ export default class TaskCard {
                                 hour12: false
                             }
                         ))),
-                createElement('button', {class: 'task-card__options'},
-                    createSVGElement({class: "icon"}, 'icon-options')));
+                createElement('nav', {class: 'task-card__options dropdown'},
+                    createElement('button', {class: 'btn-options dropdown__trigger'},
+                        createSVGElement({class: 'icon'}, 'icon-options')),
+                    createElement('ul', {class: 'dropdown__list'},
+                        createElement('li', {class: 'dropdown__item', 'data-hint': 'share(not implemented)'}, '📤'),
+                        createElement('li', {class: 'dropdown__item', 'data-hint': 'delete'}, '🗑'),
+                    )));
 
+        this.optionsDropdown = new Dropdown(this.element.querySelector('.dropdown'));
 
         if(completed) {
             this._svgUse = this.element.querySelector('.task-card__toggle use');
@@ -41,7 +48,5 @@ export default class TaskCard {
         this._onStateChange = e => {
 
         };
-
-
     }
 }

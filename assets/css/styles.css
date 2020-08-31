@@ -144,21 +144,108 @@ input[type="button"] {
 }
 
 .task-card__options {
+    width: 2em;
+    height: 2em;
+    padding: 0;
+    margin: 0.625rem 0.25rem 0 0;
+}
+
+/* endregion task card */
+
+.btn-options {
     position: relative;
     width: 2em;
     height: 2em;
     background: none;
     border: none;
     color: #798796;
-    outline: none !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
     padding: 0;
-    margin: 0.625rem 0.25rem 0 0;
+    outline: none !important;
     -webkit-transition: -webkit-transform 0.5s, color .3s;
     -moz-transition: -moz-transform 0.5s, color .3s;
     transition: transform 0.5s, color .3s;
+    z-index: 0;
 }
 
-.task-card__options:hover {
+.btn-options:hover {
     color: var(--color_stroke);
 }
-/* endregion task card */
+
+.btn-options::before {
+    content: '';
+    background: none;
+    border-radius: 50%;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0;
+    transition-duration: .15s;
+    transition-timing-function: cubic-bezier(.4, 0, .28, .99);
+    transform: scale(0);
+    transition-property: transform, opacity;
+    z-index: -1;
+}
+
+.btn-options:hover::before {
+    background-color: rgba(32, 33, 36, 0.059);
+    border: none;
+    box-shadow: none;
+    opacity: 1;
+    transform: scale(1);
+}
+
+.dropdown {
+    background: none;
+    position: relative;
+}
+
+.dropdown__trigger {
+
+}
+
+.dropdown__list {
+    --height: 0;
+    list-style: none;
+    background: #fff;
+    border-radius: 6px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.25);
+    box-sizing: border-box;
+    width: 100%;
+    max-height: 0;
+    padding: 0;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .3s .1s, visibility 0s .4s, max-height .4s, box-shadow .3s;
+    transition-timing-function: ease, ease, ease, ease;
+    transition-timing-function: cubic-bezier(.67, .17, .32, .95);
+}
+
+.dropdown_expanded .dropdown__list {
+    transition-delay: 0s;
+    visibility: visible;
+    opacity: 1;
+    max-height: var(--height);
+}
+
+.dropdown__item {
+    cursor: pointer;
+    text-align: center;
+}
+
+.dropdown__item:hover::before {
+    content: attr(data-hint);
+    position: absolute;
+    right: 120%;
+    background-color: rgba(32, 33, 36, 0.059);
+    border-radius: 5px;
+    padding: 0 .5em;
+    white-space: nowrap;
+}
