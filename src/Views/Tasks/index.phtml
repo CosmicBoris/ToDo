@@ -50,13 +50,15 @@
                     <div class="card-body">
                         <form name="new_task" class="needs-validation" novalidate>
                             <div class="form-group mb-2">
-                                <label for="formTaskTitle">Title</label>
-                                <input type="text" class="form-control" name="title" id="fTaskTitle">
+                                <!--<label for="fTaskTitle" class="float-label">Title</label>-->
+                                <input type="text" class="form-control" name="title" id="fTaskTitle"
+                                       placeholder="Title">
                                 <div class="invalid-feedback">Please enter username.</div>
                             </div>
                             <div class="form-group">
-                                <label for="formTaskContent">Description</label>
+                                <!--<label for="fTaskContent" class="float-label">Description</label>-->
                                 <textarea class="form-control" name="content" id="fTaskContent" rows="2"
+                                          placeholder="Aim high..."
                                           required></textarea>
                                 <div class="invalid-feedback">Can't add empty task.</div>
                             </div>

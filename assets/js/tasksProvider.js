@@ -29,7 +29,7 @@ const TasksProvider = () => {
     };
 
     context.editTask = (id, updatedText) => {
-        postData('/tasks/update/', `id=${id}&content=${updatedText}`)
+        /*postData('/tasks/update/', `id=${id}&content=${updatedText}`)
             .then(R => {
                 if(R.success) {
                     _taskEdited.notify();
@@ -38,12 +38,22 @@ const TasksProvider = () => {
                     btnLogin.update();
                     $('#loginModal').modal('show');
                 }
-            });
+            });*/
+
+        localTasks = localTasks.map(task => task.id === id ?
+            {id: task.id, content: updatedText, completed: task.completed, date: task.date} : task);
+        localStorage.tasks = JSON.stringify(localTasks);
+        _taskEdited.notify(null, id);
     };
 
     context.toggleTask = (id, state) => {
-        postData('/tasks/update/', `id=${id}&completed=${Number(state)}`)
-            .then(R => _taskToggled.notify(null, R));
+        /*postData('/tasks/update/', `id=${id}&completed=${Number(state)}`)
+            .then(R => _taskToggled.notify(null, R));*/
+
+        localTasks = localTasks.map(task => task.id === id ?
+            {id: task.id, content: task.content, completed: state, date: task.date} : task);
+        localStorage.tasks = JSON.stringify(localTasks);
+        _taskToggled.notify(null, id);
     };
 
     context.deleteTask = id => {

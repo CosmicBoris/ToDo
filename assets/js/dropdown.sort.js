@@ -1,3 +1,4 @@
+import Dropdown from "./dropdown.js";
 import {applyStyles, createElement} from "./util.js";
 
 const css = `
@@ -152,7 +153,7 @@ const template = `
     <div class="sort-ctr__btn-direction">
         <span></span>
     </div>
-    <ul class="sort-ctr__list"></ul>
+    <ul class="sort-ctr__list dropdown__list"></ul>
 </nav>`;
 
 const directions = {ASC: 'a', DESC: 'd'};
@@ -226,20 +227,11 @@ const DropdownSort = params => {
 
         if(params.items)
             setItems(params.items);
+
+        new Dropdown(DOM.element);
     }
 
     function initEvents(){
-        DOM.element.onclick = e => {
-            let styles = window.getComputedStyle(DOM.itemsHolder, null),
-                padding = parseInt(styles.getPropertyValue('padding-top'))
-                    + parseInt(styles.getPropertyValue('padding-bottom'));
-            if(!isNaN(padding))
-                DOM.itemsHolder.style.setProperty('--height', DOM.itemsHolder.scrollHeight + padding + 'px');
-
-            DOM.element.onclick = onClick;
-            onClick.call(DOM.element, e);
-        };
-
         DOM.element.addEventListener('focusout', onOutOfFocus);
     }
 

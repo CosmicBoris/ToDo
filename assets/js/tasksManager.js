@@ -47,7 +47,6 @@ proto.initEvents = function(){
 
 
     this.onAddTask = (sender, task) => {
-        this._sort.destroy();
         this._model.addTask(task);
     };
 
@@ -58,21 +57,21 @@ proto.initEvents = function(){
     };
 
 
-    this.onToggleTask = (sender, id) => {
-        this._model.toggleTask(id);
+    this.onToggleTask = (sender, {id, state}) => {
+        this._model.toggleTask(id, state);
     };
 
     this.onTaskToggled = (sender, id) => {
-
+        this.start();
     };
 
 
-    this.onEditTask = (id, todoText) => {
-        this._model.editTask(id, todoText);
+    this.onEditTask = (sender, {id, value}) => {
+        this._model.editTask(id, value);
     };
 
     this.onTaskEdited = (sender, id) => {
-
+        this._view.fireToast("task updated 🥳");
     };
 
 
@@ -91,7 +90,6 @@ proto.initEvents = function(){
         this._view.displayTasks(data.items);
     };
 
-
     this._view.onLoginSubmit = this.onLogin;
     this._view.onTaskSubmit = this.onAddTask;
     this._view.onTaskEdit = this.onEditTask;
@@ -99,6 +97,8 @@ proto.initEvents = function(){
     this._view.onTaskDelete = this.onDeleteTask;
 
     this._model.onTaskAdded = this.onTaskAdded;
+    this._model.onTaskEdited = this.onTaskEdited;
+    this._model.onTaskToggled = this.onTaskToggled;
 
     this._model.onDataSetChanged = this.onTasksListChanged;
 };

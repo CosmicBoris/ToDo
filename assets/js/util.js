@@ -24,10 +24,18 @@ const createElement = (name, attributes, ...children) => {
         if(attributes.hasOwnProperty(attr))
             node.setAttribute(attr, attributes[attr]);
     children.forEach(child => {
-        if(typeof child !== 'string') node.appendChild(child);
-        else node.appendChild(document.createTextNode(child));
+        if(child) {
+            if(typeof child !== 'string') node.appendChild(child);
+            else node.appendChild(document.createTextNode(child));
+        }
     });
     return node;
+}
+
+const createUseElement = id => {
+    let use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+    use.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', `#${id}`);
+    return use;
 }
 
 const createSVGElement = (attributes, symbolId) => {
@@ -38,26 +46,14 @@ const createSVGElement = (attributes, symbolId) => {
             svg.setAttributeNS(null, attr, attributes[attr]);
 
     if(symbolId) {
-        let useEl = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-        useEl.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', `#${symbolId}`);
-        svg.appendChild(useEl);
+        svg.appendChild(createUseElement(symbolId));
     }
 
     return svg;
 }
 
-const applyStyles = (css) => {
-    const head = document.head || document.getElementsByTagName('head')[0],
-        style = document.createElement('style');
-    style.type = 'text/css';
-
-    if(style.styleSheet) {
-        // This is required for IE8 and below.
-        style.styleSheet.cssText = css;
-    } else {
-        style.appendChild(document.createTextNode(css));
-    }
-    head.appendChild(style);
+const applyStyles = css => {
+    document.head.appendChild(document.createElement('style')).textContent = css;
 }
 
 const formToObject = form => Array.from(new FormData(form)).reduce((acc, [key, value]) => {
@@ -73,4 +69,13 @@ const formToQueryString = form => {
     return props.join('&');
 }
 
-export {getData, postData, createElement, createSVGElement, applyStyles, formToObject, formToQueryString}
+export {
+    getData,
+    postData,
+    createElement,
+    createSVGElement,
+    createUseElement,
+    applyStyles,
+    formToObject,
+    formToQueryString
+}

@@ -24,17 +24,16 @@ export default class TasksView {
 
         this._onTaskEdit = e => {
             if(this._temporaryTodoText) {
-                const id = parseInt(event.target.parentElement.id)
-
-                handler(id, this._temporaryTodoText)
-                this._temporaryTodoText = ''
+                const id = parseInt(e.target.closest("[data-id]").dataset.id);
+                this._editTaskHandler.notify(null, {id, value: this._temporaryTodoText});
+                this._temporaryTodoText = '';
             }
         }
 
         this._onTaskToggle = e => {
             if(e.target.type === 'checkbox') {
-                const id = e.target.closest('[data-id]').getAttribute('data-id');
-                this._toggleTaskHandler.notify(null, id);
+                const id = parseInt(e.target.closest("[data-id]").dataset.id);
+                this._toggleTaskHandler.notify(null, {id, state: e.target.checked});
             }
         }
 
@@ -68,9 +67,14 @@ export default class TasksView {
             form.addEventListener('submit', this._onFormSubmit, false);
         }
 
-        this.DOM.cardWrapper.addEventListener('focusout', this._onTaskEdit);
         this.DOM.cardWrapper.addEventListener('click', this._onTaskDelete);
         this.DOM.cardWrapper.addEventListener('change', this._onTaskToggle);
+        this.DOM.cardWrapper.addEventListener('focusout', this._onTaskEdit);
+        this.DOM.cardWrapper.addEventListener('input', e => {
+            if(e.target.isContentEditable) {
+                this._temporaryTodoText = e.target.innerText;
+            }
+        });
     }
 
     taskAdded(){

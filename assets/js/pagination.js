@@ -5,8 +5,7 @@ const Pagination = (container, callback) => {
         while(_ul.firstChild)
             _ul.removeChild(_ul.firstChild);
 
-        if(_pagesCount < 2)
-            return;
+        if(_pagesCount < 2) return;
 
         for(let i = 1; i <= _pagesCount; i++)
             _ul.insertAdjacentHTML('beforeend',
@@ -26,9 +25,8 @@ const Pagination = (container, callback) => {
     let _pagesCount = 0,
         _currentPage = 1,
         _ul = createElement("ul", {class: "pagination justify-content-center"});
-    container.appendChild(_ul);
-
     _ul.addEventListener('click', onClick, false);
+    container.appendChild(_ul);
 
     return {
         show: _ => _ul.style.visibility = "visible",
